@@ -248,10 +248,7 @@ theorem coe_int_add_eq_ite {n : Nat} (u v : Fin n) :
 
 theorem coe_int_add_eq_mod {n : Nat} (u v : Fin n) :
     ((u + v : Fin n) : Int) = ((u : Int) + (v : Int)) % n := by
-  rw [coe_int_add_eq_ite]
-  split
-  · rw [Int.emod_eq_of_lt] <;> omega
-  · rw [Int.emod_eq_sub_self_emod, Int.emod_eq_of_lt] <;> omega
+  omega
 
 -- Write `a + b` as `if (a + b : ℕ) < n then (a + b : ℤ) else (a + b : ℤ) - n` and
 -- similarly `a - b` as `if (b : ℕ) ≤ a then (a - b : ℤ) else (a - b : ℤ) + n`.
@@ -334,12 +331,11 @@ lemma intCast_val_sub_eq_sub_add_ite {n : ℕ} (a b : Fin n) :
     ((a - b).val : ℤ) = a.val - b.val + if b ≤ a then 0 else n := by
   split <;> fin_omega
 
-lemma sub_val_lt_sub {n : ℕ} {i j : Fin n} (hij : i ≤ j) : (j - i).1 < n - i.1 := by
+lemma sub_val_lt_sub {n : ℕ} {i j : Fin n} (hij : i ≤ j) : (j - i).val < n - i.val := by
   simp [sub_val_of_le hij, Nat.sub_lt_sub_right hij j.isLt]
 
-local instance {n : ℕ} {i : Fin n} : NeZero (n - i.1) := neZero_iff.mpr (by omega)
-
-lemma castLT_sub_nezero {n : ℕ} {i j : Fin n}(hij : i < j) :
+lemma castLT_sub_nezero {n : ℕ} {i j : Fin n} (hij : i < j) :
+    letI : NeZero (n - i.1) := neZero_iff.mpr (by omega)
     (j - i).castLT (sub_val_lt_sub (Fin.le_of_lt hij)) ≠ 0 := by
   refine Ne.symm (ne_of_val_ne ?_)
   simpa [coe_sub_iff_le.mpr (Fin.le_of_lt hij)] using by omega
@@ -572,7 +568,7 @@ theorem le_of_castSucc_lt_of_succ_lt {a b : Fin (n + 1)} {i : Fin n}
   simp [Fin.lt_def, -val_fin_lt] at *; omega
 
 theorem castSucc_lt_or_lt_succ (p : Fin (n + 1)) (i : Fin n) : castSucc i < p ∨ p < i.succ := by
-  simp [Fin.lt_def, -val_fin_lt]; omega
+  simpa [Fin.lt_def, -val_fin_lt] using by omega
 
 theorem succ_le_or_le_castSucc (p : Fin (n + 1)) (i : Fin n) : succ i ≤ p ∨ p ≤ i.castSucc := by
   rw [le_castSucc_iff, ← castSucc_lt_iff_succ_le]
@@ -699,9 +695,7 @@ theorem castSucc_pred_eq_pred_castSucc {a : Fin (n + 1)} (ha : a ≠ 0) :
 
 theorem castSucc_pred_add_one_eq {a : Fin (n + 1)} (ha : a ≠ 0) :
     (a.pred ha).castSucc + 1 = a := by
-  cases a using cases
-  · exact (ha rfl).elim
-  · rw [pred_succ, coeSucc_eq_succ]
+  simp
 
 theorem le_pred_castSucc_iff {a b : Fin (n + 1)} (ha : castSucc a ≠ 0) :
     b ≤ (castSucc a).pred ha ↔ b < a := by
@@ -756,7 +750,7 @@ theorem castPred_eq_iff_eq_castSucc (i : Fin (n + 1)) (hi : i ≠ last _) (j : F
 @[simp]
 theorem castPred_mk (i : ℕ) (h₁ : i < n) (h₂ := h₁.trans (Nat.lt_succ_self _))
     (h₃ : ⟨i, h₂⟩ ≠ last _ := (ne_iff_vne _ _).mpr (val_last _ ▸ h₁.ne)) :
-  castPred ⟨i, h₂⟩ h₃ = ⟨i, h₁⟩ := rfl
+    castPred ⟨i, h₂⟩ h₃ = ⟨i, h₁⟩ := rfl
 
 @[simp]
 theorem castPred_le_castPred_iff {i j : Fin (n + 1)} {hi : i ≠ last n} {hj : j ≠ last n} :
@@ -1049,7 +1043,7 @@ lemma exists_succAbove_eq {x y : Fin (n + 1)} (h : x ≠ y) : ∃ z, y.succAbove
   Set.ext fun _ => exists_succAbove_eq_iff
 
 @[simp] lemma range_succ (n : ℕ) : Set.range (Fin.succ : Fin n → Fin (n + 1)) = {0}ᶜ := by
-  rw [← succAbove_zero]; exact range_succAbove (0 : Fin (n + 1))
+  rw [← succAbove_zero, range_succAbove]
 
 /-- `succAbove` is injective at the pivot -/
 lemma succAbove_left_injective : Injective (@succAbove n) := fun _ _ h => by
@@ -1091,14 +1085,14 @@ lemma castPred_succAbove_castPred {a : Fin (n + 2)} {b : Fin (n + 1)} (ha : a �
   simp_rw [← castSucc_inj (b := (a.succAbove b).castPred hk), ← castSucc_succAbove_castSucc,
     castSucc_castPred]
 
-lemma one_succAbove_zero {n : ℕ} : (1 : Fin (n + 2)).succAbove 0 = 0 := by
-  rfl
+lemma one_succAbove_zero {n : ℕ} : (1 : Fin (n + 2)).succAbove 0 = 0 := rfl
 
 /-- By moving `succ` to the outside of this expression, we create opportunities for further
 simplification using `succAbove_zero` or `succ_succAbove_zero`. -/
 @[simp] lemma succ_succAbove_one {n : ℕ} [NeZero n] (i : Fin (n + 1)) :
     i.succ.succAbove 1 = (i.succAbove 0).succ := by
-  rw [← succ_zero_eq_one']; convert succ_succAbove_succ i 0
+  rw [← succ_zero_eq_one']
+  exact succ_succAbove_succ i 0
 
 @[simp] lemma one_succAbove_succ {n : ℕ} (j : Fin n) :
     (1 : Fin (n + 2)).succAbove j.succ = j.succ.succ := by
@@ -1187,10 +1181,11 @@ lemma predAbove_zero_succ [NeZero n] {i : Fin n} : predAbove 0 i.succ = i := by
 
 @[simp] lemma predAbove_zero_of_ne_zero [NeZero n] {i : Fin (n + 1)} (hi : i ≠ 0) :
     predAbove 0 i = i.pred hi := by
-  obtain ⟨y, rfl⟩ := exists_succ_eq.2 hi; exact predAbove_zero_succ
+  obtain ⟨y, rfl⟩ := exists_succ_eq.2 hi
+  exact predAbove_zero_succ
 
 lemma succ_predAbove_zero [NeZero n] {j : Fin (n + 1)} (h : j ≠ 0) : succ (predAbove 0 j) = j := by
-  simp [*]
+  simp [h]
 
 lemma predAbove_zero [NeZero n] {i : Fin (n + 1)} :
     predAbove (0 : Fin n) i = if hi : i = 0 then 0 else i.pred hi := by
@@ -1215,6 +1210,14 @@ lemma predAbove_last_apply {i : Fin (n + 2)} :
   split_ifs with hi
   · rw [hi, predAbove_right_last]
   · rw [predAbove_last_of_ne_last hi]
+
+lemma predAbove_surjective {n : ℕ} (p : Fin n) :
+    Function.Surjective p.predAbove := by
+  intro i
+  by_cases hi : i ≤ p
+  · exact ⟨i.castSucc, predAbove_castSucc_of_le p i hi⟩
+  · rw [Fin.not_le] at hi
+    exact ⟨i.succ, predAbove_succ_of_le p i (Fin.le_of_lt hi)⟩
 
 /-- Sending `Fin (n+1)` to `Fin n` by subtracting one from anything above `p`
 then back to `Fin (n+1)` with a gap around `p` is the identity away from `p`. -/
@@ -1400,8 +1403,7 @@ theorem exists_eq_add_of_lt {n : ℕ} {a b : Fin (n + 1)} (h : a < b) :
   refine ⟨⟨k, hkb.trans b.is_lt⟩, hkb, by fin_omega, ?_⟩
   simp [Fin.ext_iff, Fin.val_add, ← hk, Nat.mod_eq_of_lt b.is_lt]
 
-lemma pos_of_ne_zero {n : ℕ} {a : Fin (n + 1)} (h : a ≠ 0) :
-    0 < a :=
+lemma pos_of_ne_zero {n : ℕ} {a : Fin (n + 1)} (h : a ≠ 0) : 0 < a :=
   Nat.pos_of_ne_zero (val_ne_of_ne h)
 
 lemma sub_succ_le_sub_of_le {n : ℕ} {u v : Fin (n + 2)} (h : u < v) : v - (u + 1) < v - u := by
@@ -1419,6 +1421,10 @@ theorem coe_natCast_eq_mod (m n : ℕ) [NeZero m] :
 theorem coe_ofNat_eq_mod (m n : ℕ) [NeZero m] :
     ((ofNat(n) : Fin m) : ℕ) = ofNat(n) % m :=
   rfl
+
+theorem val_add_one_of_lt' {n : ℕ} [NeZero n] {i : Fin n} (h : i + 1 < n) :
+    (i + 1).val = i.val + 1 := by
+  simpa [add_def] using Nat.mod_eq_of_lt (by omega)
 
 instance [NeZero n] [NeZero ofNat(m)] : NeZero (ofNat(m) : Fin (n + ofNat(m))) := by
   suffices m % (n + m) = m by simpa [neZero_iff, Fin.ext_iff, OfNat.ofNat, this] using NeZero.ne m
