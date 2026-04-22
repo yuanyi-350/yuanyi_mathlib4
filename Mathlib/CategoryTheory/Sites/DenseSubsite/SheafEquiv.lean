@@ -57,17 +57,9 @@ lemma isIso_ranCounit_app_of_isDenseSubsite (Y : Sheaf J A) (U X) :
       ← op_comp, ← e'] at this ⊢
     simpa [← NatTrans.naturality] using this
   · intro f
-    have (X Y Z) (f : X ⟶ Y) (g : G.obj Y ⟶ G.obj Z) (hf : G.imageSieve g f) : Exists _ := hf
-    choose l hl using this
     let c : Limits.Cone (StructuredArrow.proj (op (G.obj U)) G.op ⋙ Y.obj) := by
       refine ⟨X, ⟨fun g ↦ ?_, ?_⟩⟩
-      · refine Y.2.amalgamate ⟨_, IsDenseSubsite.imageSieve_mem J K G g.hom.unop⟩
-          (fun I ↦ f ≫ Y.1.map (l _ _ _ _ _ I.hf).op) fun I₁ I₂ r ↦ ?_
-        apply (Y.2 X _ (IsDenseSubsite.equalizer_mem J K G (r.g₁ ≫ l _ _ _ _ _ I₁.hf)
-          (r.g₂ ≫ l _ _ _ _ _ I₂.hf) ?_)).isSeparatedFor.ext fun V iUV (hiUV : _ = _) ↦ ?_
-        · simp only [const_obj_obj, op_obj, map_comp, hl]
-          simp only [← map_comp_assoc, r.w]
-        · simp [← map_comp, ← op_comp, hiUV]
+      · exact f ≫ IsDenseSubsite.mapPreimage K G Y g.hom.unop
       · dsimp
         rintro ⟨⟨⟨⟩⟩, ⟨W₁⟩, g₁⟩ ⟨⟨⟨⟩⟩, ⟨W₂⟩, g₂⟩ ⟨⟨⟨⟨⟩⟩⟩, i, hi⟩
         dsimp at g₁ g₂ i hi
@@ -79,27 +71,14 @@ lemma isIso_ranCounit_app_of_isDenseSubsite (Y : Sheaf J A) (U X) :
         have h : ∃ i' : W₂ ⟶ W₁, i = i'.op := ⟨i.unop, rfl⟩
         rcases h with ⟨i, rfl⟩
         simp only [unop_comp, Quiver.Hom.unop_op, Category.id_comp]
-        apply Y.2.hom_ext ⟨_, IsDenseSubsite.imageSieve_mem J K G (G.map i ≫ g)⟩
-        intro I
-        simp only [Presheaf.IsSheaf.amalgamate_map, Category.assoc, ← Functor.map_comp, ← op_comp]
-        let I' : GrothendieckTopology.Cover.Arrow ⟨_, IsDenseSubsite.imageSieve_mem J K G g⟩ :=
-          ⟨_, I.f ≫ i, ⟨l _ _ _ _ _ I.hf, by simp [hl]⟩⟩
-        refine Eq.trans ?_ (Y.2.amalgamate_map _ _ _ I').symm
-        apply (Y.2 X _ (IsDenseSubsite.equalizer_mem J K G (l _ _ _ _ _ I.hf)
-          (l _ _ _ _ _ I'.hf) (by simp [I', hl]))).isSeparatedFor.ext
-            fun V iUV (hiUV : _ = _) ↦ ?_
-        simp [I', ← Functor.map_comp, ← op_comp, hiUV]
+        rw [Category.assoc, IsDenseSubsite.mapPreimage_comp_map]
     refine ⟨(isPointwiseRightKanExtensionRanCounit G.op Y.1 (.op (G.obj U))).lift c, ?_⟩
     · have := (isPointwiseRightKanExtensionRanCounit G.op Y.1 (.op (G.obj U))).fac c (.mk (𝟙 _))
       simp only [id_obj, comp_obj, StructuredArrow.proj_obj, StructuredArrow.mk_right,
         RightExtension.coneAt_pt, RightExtension.mk_left, RightExtension.coneAt_π_app,
         const_obj_obj, op_obj, StructuredArrow.mk_hom_eq_self, map_id, whiskeringLeft_obj_obj,
         RightExtension.mk_hom, Category.id_comp] at this
-      simp only [c, id_obj, yoneda_map_app, this]
-      apply Y.2.hom_ext ⟨_, IsDenseSubsite.imageSieve_mem J K G (𝟙 (G.obj U))⟩ _ _ fun I ↦ ?_
-      apply (Y.2 X _ (IsDenseSubsite.equalizer_mem J K G (l _ _ _ _ _ I.hf)
-        I.f (by simp [hl]))).isSeparatedFor.ext fun V iUV (hiUV : _ = _) ↦ ?_
-      simp [← Functor.map_comp, ← op_comp, hiUV]
+      simpa [c, yoneda_map_app] using this
 
 instance (Y : Sheaf J A) : IsIso ((G.sheafAdjunctionCocontinuous A J K).counit.app Y) := by
   apply +allowSynthFailures ReflectsIsomorphisms.reflects (sheafToPresheaf J A)

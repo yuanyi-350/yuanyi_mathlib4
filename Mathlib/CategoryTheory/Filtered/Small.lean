@@ -120,9 +120,7 @@ theorem small_fullSubcategory_filteredClosure :
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
     refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
     · simp only [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      refine FilteredClosureSmall.InductiveStep.max ?_ ?_ x y
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
+      exact FilteredClosureSmall.InductiveStep.max (by omega) (by omega) x y
     · simp only [FilteredClosureSmall.abstractFilteredClosureRealization]
       rw! [FilteredClosureSmall.bundledAbstractFilteredClosure]
       rfl
@@ -131,9 +129,7 @@ theorem small_fullSubcategory_filteredClosure :
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
     refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
     · simp only [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      refine FilteredClosureSmall.InductiveStep.coeq ?_ ?_ x y g g'
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
+      exact FilteredClosureSmall.InductiveStep.coeq (by omega) (by omega) x y g g'
     · simp only [FilteredClosureSmall.abstractFilteredClosureRealization]
       rw! [FilteredClosureSmall.bundledAbstractFilteredClosure]
       rfl
@@ -273,9 +269,7 @@ theorem small_fullSubcategory_cofilteredClosure :
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
     refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
     · simp only [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      refine CofilteredClosureSmall.InductiveStep.min ?_ ?_ x y
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
+      exact CofilteredClosureSmall.InductiveStep.min (by omega) (by omega) x y
     · simp only [CofilteredClosureSmall.abstractCofilteredClosureRealization]
       rw! [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
       rfl
@@ -284,9 +278,7 @@ theorem small_fullSubcategory_cofilteredClosure :
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
     refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
     · simp only [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      refine CofilteredClosureSmall.InductiveStep.eq ?_ ?_ x y g g'
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
+      exact CofilteredClosureSmall.InductiveStep.eq (by omega) (by omega) x y g g'
     · simp only [CofilteredClosureSmall.abstractCofilteredClosureRealization]
       rw! [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
       rfl

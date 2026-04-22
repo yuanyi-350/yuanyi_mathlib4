@@ -690,25 +690,16 @@ lemma isSheafFor_of_nat_equiv {P₁ : Cᵒᵖ ⥤ Type w} {P₂ : Cᵒᵖ ⥤ Ty
       e (P₁.map f.op x) = P₂.map f.op (e x))
     {X : C} {R : Presieve X} (hP₁ : IsSheafFor P₁ R) :
     IsSheafFor P₂ R := fun x₂ hx₂ ↦ by
-  have he' : ∀ ⦃X Y : C⦄ (f : X ⟶ Y) (x : P₂.obj (op Y)),
-    e.symm (P₂.map f.op x) = P₁.map f.op (e.symm x) := fun X Y f x ↦
-      e.injective (by simp only [Equiv.apply_symm_apply, he])
   let x₁ : FamilyOfElements P₁ R := fun Y f hf ↦ e.symm (x₂ f hf)
   have hx₁ : x₁.Compatible := fun Y₁ Y₂ Z g₁ g₂ f₁ f₂ h₁ h₂ fac ↦ e.injective
     (by simp only [he, Equiv.apply_symm_apply, hx₂ g₁ g₂ h₁ h₂ fac, x₁])
-  have : ∀ (t₂ : P₂.obj (op X)),
-      x₂.IsAmalgamation t₂ ↔ x₁.IsAmalgamation (e.symm t₂) := fun t₂ ↦ by
-    simp only [FamilyOfElements.IsAmalgamation, x₁,
-      ← he', EmbeddingLike.apply_eq_iff_eq]
-  refine ⟨e (hP₁.amalgamate x₁ hx₁), ?_, ?_⟩
-  · dsimp
-    simp only [this, Equiv.symm_apply_apply]
-    exact IsSheafFor.isAmalgamation hP₁ hx₁
-  · intro t₂ ht₂
-    refine e.symm.injective ?_
-    simp only [Equiv.symm_apply_apply]
-    exact hP₁.isSeparatedFor x₁ _ _ (by simpa only [this] using ht₂)
-      (IsSheafFor.isAmalgamation hP₁ hx₁)
+  refine (Equiv.existsUnique_congr (@e X) (fun t₁ ↦ ?_)).1 (hP₁ x₁ hx₁)
+  constructor
+  · intro ht Y f hf
+    rw [← he f t₁, ht f hf, Equiv.apply_symm_apply]
+  · intro ht Y f hf
+    apply (@e Y).injective
+    rw [he, Equiv.apply_symm_apply, ht f hf]
 
 lemma isSheafFor_iff_of_nat_equiv {P₁ : Cᵒᵖ ⥤ Type w} {P₂ : Cᵒᵖ ⥤ Type w'}
     (e : ∀ ⦃X : C⦄, P₁.obj (op X) ≃ P₂.obj (op X))
@@ -852,18 +843,8 @@ def Arrows.toCompatible (s : P.obj (op B)) :
 theorem isSheafFor_ofArrows_iff_bijective_toCompabible :
     IsSheafFor P (ofArrows X π) ↔
       Function.Bijective (Arrows.toCompatible P π) := by
-  rw [isSheafFor_arrows_iff]
-  refine ⟨fun h ↦ ⟨fun x₁ x₂ hx ↦
-      (h _ (Arrows.toCompatible P π x₁).property).unique (fun _ ↦ rfl)
-        (congr_fun (congr_arg Subtype.val hx.symm)),
-      fun ⟨y, hy⟩ ↦ ?_⟩, fun h x hx ↦ ?_⟩
-  · obtain ⟨x, hx, _⟩ := h y hy
-    exact ⟨x, by ext; apply hx⟩
-  · obtain ⟨y, hy⟩ := h.2 ⟨x, hx⟩
-    rw [Subtype.ext_iff] at hy
-    dsimp at hy
-    subst hy
-    exact ⟨y, fun _ ↦ rfl, fun y' hy' ↦ h.1 (by ext; apply hy')⟩
+  rw [isSheafFor_arrows_iff, Function.bijective_iff_existsUnique]
+  simp [Arrows.toCompatible, Subtype.ext_iff, funext_iff]
 
 @[simp]
 lemma isSheafFor_pullback_iff (P : Cᵒᵖ ⥤ Type w) {X : C} (R : Sieve X)

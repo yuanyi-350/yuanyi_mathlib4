@@ -6,8 +6,8 @@ Authors: Bhavik Mehta
 module
 
 public import Mathlib.CategoryTheory.Monoidal.Closed.Cartesian
-public import Mathlib.CategoryTheory.Limits.Presheaf
 public import Mathlib.CategoryTheory.Monoidal.Cartesian.FunctorCategory
+public import Mathlib.CategoryTheory.Monoidal.Closed.FunctorToTypes
 public import Mathlib.CategoryTheory.Monoidal.Types.Basic
 
 /-!
@@ -47,25 +47,16 @@ instance : MonoidalClosed (Type v₁) := MonoidalClosed.mk
   fun X => Closed.mk _ (Types.tensorProductAdjunction X)
 
 instance {C : Type v₁} [SmallCategory C] : MonoidalClosed (C ⥤ Type v₁) :=
-  MonoidalClosed.mk fun F => by
-    haveI : ∀ X : Type v₁, PreservesColimits (tensorLeft X) := by infer_instance
-    letI : PreservesColimits (tensorLeft F) := ⟨by infer_instance⟩
-    have := Presheaf.isLeftAdjoint_of_preservesColimits.{v₁} (tensorLeft F)
-    exact Closed.mk _ (Adjunction.ofIsLeftAdjoint (tensorLeft F))
+  FunctorToTypes.monoidalClosed.{0, v₁, v₁}
 
 -- TODO: once we have `MonoidalClosed` instances for functor categories into general monoidal
 -- closed categories, replace this with that, as it will be a more explicit construction.
-attribute [local instance] uliftCategory in
 /-- This is not a good instance because of the universe levels. Below is the instance where the
 target category is `Type (max u₁ v₁)`. -/
 @[implicit_reducible]
 def cartesianClosedFunctorToTypes {C : Type u₁} [Category.{v₁} C] :
     MonoidalClosed (C ⥤ Type (max u₁ v₁ u₂)) :=
-  let e : (ULiftHom.{max u₁ v₁ u₂} (ULift.{max u₁ v₁ u₂} C)) ⥤ Type (max u₁ v₁ u₂) ≌
-      C ⥤ Type (max u₁ v₁ u₂) :=
-      Functor.asEquivalence ((Functor.whiskeringLeft _ _ _).obj
-        (ULift.equivalence.trans ULiftHom.equiv).functor)
-  cartesianClosedOfEquiv e
+  FunctorToTypes.monoidalClosed.{u₂, v₁, u₁}
 
 -- TODO: once we have `MonoidalClosed` instances for functor categories into general monoidal
 -- closed categories, replace this with that, as it will be a more explicit construction.

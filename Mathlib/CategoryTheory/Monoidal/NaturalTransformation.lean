@@ -84,12 +84,6 @@ instance (F : C ⥤ D) [F.LaxMonoidal] : NatTrans.IsMonoidal F.rightUnitor.hom w
 
 instance (F : C ⥤ D) (G : D ⥤ E) (H : E ⥤ E') [F.LaxMonoidal] [G.LaxMonoidal] [H.LaxMonoidal] :
     NatTrans.IsMonoidal (Functor.associator F G H).hom where
-  unit := by
-    simp only [comp_obj, comp_ε, assoc, Functor.map_comp, associator_hom_app, comp_id,
-      Functor.comp_map]
-  tensor X Y := by
-    simp only [comp_obj, comp_μ, associator_hom_app, Functor.comp_map, map_comp,
-      comp_id, tensorHom_id, id_whiskerRight, assoc, id_comp]
 
 end IsMonoidal
 
@@ -98,16 +92,6 @@ instance {F G : C ⥤ D} {H K : C ⥤ E} (α : F ⟶ G) (β : H ⟶ K)
     [F.LaxMonoidal] [G.LaxMonoidal] [IsMonoidal α]
     [H.LaxMonoidal] [K.LaxMonoidal] [IsMonoidal β] :
     IsMonoidal (NatTrans.prod' α β) where
-  unit := by
-    ext
-    · rw [prod_comp_fst, prod'_ε_fst, prod'_ε_fst, prod'_app_fst, IsMonoidal.unit]
-    · rw [prod_comp_snd, prod'_ε_snd, prod'_ε_snd, prod'_app_snd, IsMonoidal.unit]
-  tensor X Y := by
-    ext
-    · simp only [prod_comp_fst, prod'_μ_fst, prod'_app_fst,
-        prodMonoidal_tensorHom, IsMonoidal.tensor]
-    · simp only [prod_comp_snd, prod'_μ_snd, prod'_app_snd,
-        prodMonoidal_tensorHom, IsMonoidal.tensor]
 
 end NatTrans
 
@@ -136,23 +120,13 @@ variable [F.Monoidal] [G.LaxMonoidal] [adj.IsMonoidal]
 
 set_option backward.isDefEq.respectTransparency false in
 instance : NatTrans.IsMonoidal adj.unit where
-  unit := by
-    dsimp
-    rw [id_comp, ← unit_app_unit_comp_map_η adj, assoc, Monoidal.map_η_ε]
-    dsimp
-    rw [comp_id]
-  tensor X Y := by
-    dsimp
-    rw [← unit_app_tensor_comp_map_δ_assoc, id_comp, Monoidal.map_δ_μ, comp_id]
+  unit := by simpa using (adj.unit_app_unit_comp_map_η_assoc (G.map (ε F)))
+  tensor X Y := by simpa using (adj.unit_app_tensor_comp_map_δ_assoc X Y (G.map (μ F X Y)))
 
 set_option backward.isDefEq.respectTransparency false in
 instance : NatTrans.IsMonoidal adj.counit where
-  unit := by
-    dsimp
-    rw [assoc, map_ε_comp_counit_app_unit adj, ε_η]
-  tensor X Y := by
-    dsimp
-    rw [assoc, map_μ_comp_counit_app_tensor, μ_δ_assoc, comp_id]
+  unit := by simpa using congrArg (fun f => ε F ≫ f) (adj.map_ε_comp_counit_app_unit)
+  tensor X Y := by simpa using congrArg (μ F _ _ ≫ ·) (adj.map_μ_comp_counit_app_tensor X Y)
 
 end IsMonoidal
 

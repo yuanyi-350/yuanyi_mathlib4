@@ -422,20 +422,7 @@ theorem finset_inf_factors {I : Type*} {A B : C} {s : Finset I} {P : I → Subob
 -- `i` is explicit here because often we'd like to defer a proof of `m`
 theorem finset_inf_arrow_factors {I : Type*} {B : C} (s : Finset I) (P : I → Subobject B) (i : I)
     (m : i ∈ s) : (P i).Factors (s.inf P).arrow := by
-  classical
-  revert i m
-  induction s using Finset.induction_on with
-  | empty => rintro _ ⟨⟩
-  | insert _ _ _ ih =>
-    intro _ m
-    rw [Finset.inf_insert]
-    simp only [Finset.mem_insert] at m
-    rcases m with (rfl | m)
-    · rw [← factorThru_arrow _ _ (inf_arrow_factors_left _ _)]
-      exact factors_comp_arrow _
-    · rw [← factorThru_arrow _ _ (inf_arrow_factors_right _ _)]
-      apply factors_of_factors_right
-      exact ih _ m
+  exact (finset_inf_factors (s.inf P).arrow).mp (factors_self (s.inf P)) i m
 
 theorem inf_eq_map_pullback' {A : C} (f₁ : MonoOver A) (f₂ : Subobject A) :
     (Subobject.inf.obj (Quotient.mk'' f₁)).obj f₂ =
@@ -510,17 +497,8 @@ variable [HasInitial C] [InitialMonoClass C]
 
 theorem finset_sup_factors {I : Type*} {A B : C} {s : Finset I} {P : I → Subobject B} {f : A ⟶ B}
     (h : ∃ i ∈ s, (P i).Factors f) : (s.sup P).Factors f := by
-  classical
-  revert h
-  induction s using Finset.induction_on with
-  | empty => rintro ⟨_, ⟨⟨⟩, _⟩⟩
-  | insert _ _ _ ih =>
-    rintro ⟨j, ⟨m, h⟩⟩
-    simp only [Finset.sup_insert]
-    simp only [Finset.mem_insert] at m
-    rcases m with (rfl | m)
-    · exact sup_factors_of_factors_left h
-    · exact sup_factors_of_factors_right (ih ⟨j, ⟨m, h⟩⟩)
+  rcases h with ⟨i, hi, hf⟩
+  exact factors_of_le f (Finset.le_sup hi) hf
 
 end SemilatticeSup
 

@@ -62,12 +62,7 @@ def mapTrifunctor (I₁ I₂ I₃ : Type*) :
   map {X₁ Y₁} φ :=
     { app := fun X₂ =>
         { app := fun X₃ x => ((F.map (φ x.1)).app (X₂ x.2.1)).app (X₃ x.2.2) }
-      naturality := fun {X₂ Y₂} ψ => by
-        ext X₃ x
-        dsimp
-        simp only [← NatTrans.comp_app]
-        congr 1
-        rw [NatTrans.naturality] }
+      naturality := fun {X₂ Y₂} ψ => by cat_disch }
 end
 
 section
@@ -194,27 +189,15 @@ noncomputable def mapTrifunctorMapFunctorObj (X₁ : GradedObject I₁ C₁)
         ext j i₁ i₂ i₃ h
         simp only [ι_mapTrifunctorMapMap, categoryOfGradedObjects_id, Functor.map_id,
           NatTrans.id_app, id_comp, comp_id]
-      map_comp := fun {X₃ Y₃ Z₃} φ ψ => by
-        ext j i₁ i₂ i₃ h
-        simp only [ι_mapTrifunctorMapMap, categoryOfGradedObjects_id, Functor.map_id,
-          NatTrans.id_app, categoryOfGradedObjects_comp, Functor.map_comp, assoc, id_comp,
-          ι_mapTrifunctorMapMap_assoc] }
+      map_comp := fun {X₃ Y₃ Z₃} φ ψ => by cat_disch }
   map {X₂ Y₂} φ :=
     { app := fun X₃ => mapTrifunctorMapMap F p (𝟙 X₁) φ (𝟙 X₃)
-      naturality := fun {X₃ Y₃} ψ => by
-        ext j i₁ i₂ i₃ h
-        dsimp
-        simp only [ι_mapTrifunctorMapMap_assoc, categoryOfGradedObjects_id, Functor.map_id,
-          NatTrans.id_app, ι_mapTrifunctorMapMap, id_comp, NatTrans.naturality_assoc] }
+      naturality := fun {X₃ Y₃} ψ => by cat_disch }
   map_id X₂ := by
     ext X₃ j i₁ i₂ i₃ h
     simp only [ι_mapTrifunctorMapMap, categoryOfGradedObjects_id, Functor.map_id,
       NatTrans.id_app, id_comp, comp_id]
-  map_comp {X₂ Y₂ Z₂} φ ψ := by
-    ext X₃ j i₁ i₂ i₃
-    simp only [ι_mapTrifunctorMapMap, categoryOfGradedObjects_id, Functor.map_id,
-      NatTrans.id_app, categoryOfGradedObjects_comp, Functor.map_comp, NatTrans.comp_app,
-      id_comp, assoc, ι_mapTrifunctorMapMap_assoc]
+  map_comp {X₂ Y₂ Z₂} φ ψ := by cat_disch
 
 /-- Given a trifunctor `F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄` and a map `p : I₁ × I₂ × I₃ → J`,
 this is the functor
@@ -229,19 +212,8 @@ noncomputable def mapTrifunctorMap
   map := fun {X₁ Y₁} φ =>
     { app := fun X₂ =>
         { app := fun X₃ => mapTrifunctorMapMap F p φ (𝟙 X₂) (𝟙 X₃)
-          naturality := fun {X₃ Y₃} φ => by
-            dsimp
-            ext j i₁ i₂ i₃ h
-            dsimp
-            simp only [ι_mapTrifunctorMapMap_assoc, categoryOfGradedObjects_id, Functor.map_id,
-              NatTrans.id_app, ι_mapTrifunctorMapMap, id_comp, NatTrans.naturality_assoc] }
-      naturality := fun {X₂ Y₂} ψ => by
-        ext X₃ j
-        dsimp
-        ext i₁ i₂ i₃ h
-        simp only [ι_mapTrifunctorMapMap_assoc, categoryOfGradedObjects_id, Functor.map_id,
-          NatTrans.id_app, ι_mapTrifunctorMapMap, id_comp,
-          NatTrans.naturality_app_assoc] }
+          naturality := fun {X₃ Y₃} φ => by cat_disch }
+      naturality := fun {X₂ Y₂} ψ => by cat_disch }
 
 attribute [simps] mapTrifunctorMap
 

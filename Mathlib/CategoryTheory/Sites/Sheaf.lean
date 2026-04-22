@@ -519,12 +519,7 @@ def isLimitOfIsSheaf {X : C} (S : J.Cover X) (hP : IsSheaf J P) : IsLimit (S.mul
   lift := fun E : Multifork _ => hP.amalgamate S (fun _ => E.ι _)
     (fun _ _ r => E.condition ⟨r⟩)
   fac := by
-    rintro (E : Multifork _) (a | b)
-    · apply hP.amalgamate_map
-    · rw [← E.w (WalkingMulticospan.Hom.fst b),
-        ← (S.multifork P).w (WalkingMulticospan.Hom.fst b), ← assoc]
-      congr 1
-      apply hP.amalgamate_map
+    rintro (E : Multifork _) (a | b) <;> simp
   uniq := by
     rintro (E : Multifork _) m hm
     apply hP.hom_ext S
@@ -619,12 +614,8 @@ def secondMap : firstObj R P ⟶ secondObj R P :=
 
 set_option backward.isDefEq.respectTransparency false in
 theorem w : forkMap R P ≫ firstMap R P = forkMap R P ≫ secondMap R P := by
-  apply limit.hom_ext
-  rintro ⟨⟨Y, f, hf⟩, ⟨Z, g, hg⟩⟩
-  simp only [firstMap, secondMap, forkMap, limit.lift_π, limit.lift_π_assoc, assoc, Fan.mk_π_app,
-    Subtype.coe_mk]
-  rw [← P.map_comp, ← op_comp, pullback.condition]
-  simp
+  refine limit.hom_ext fun ⟨⟨Y, f, hf⟩, ⟨Z, g, hg⟩⟩ => ?_
+  simp [firstMap, secondMap, forkMap, ← P.map_comp, ← op_comp, pullback.condition]
 
 /-- An alternative definition of the sheaf condition in terms of equalizers. This is shown to be
 equivalent in `CategoryTheory.Presheaf.isSheaf_iff_isSheaf'`.
@@ -645,17 +636,12 @@ def isSheafForIsSheafFor' (P : Cᵒᵖ ⥤ A) (s : A ⥤ Type max v₁ u₁)
       (Equalizer.Presieve.secondMap (P ⋙ s) R) := by
     refine parallelPair.ext (PreservesProduct.iso s _) ((PreservesProduct.iso s _))
       (limit.hom_ext (fun j => ?_)) (limit.hom_ext (fun j => ?_))
-    · dsimp [Equalizer.Presieve.firstMap, firstMap]
-      simp only [map_lift_piComparison, Functor.map_comp, limit.lift_π, Fan.mk_pt,
-        Fan.mk_π_app, assoc, piComparison_comp_π_assoc]
-    · dsimp [Equalizer.Presieve.secondMap, secondMap]
-      simp only [map_lift_piComparison, Functor.map_comp, limit.lift_π, Fan.mk_pt,
-        Fan.mk_π_app, assoc, piComparison_comp_π_assoc]
+    · simp [Equalizer.Presieve.firstMap, firstMap]
+    · simp [Equalizer.Presieve.secondMap, secondMap]
   refine Equiv.trans (isLimitMapConeForkEquiv _ _) ?_
   refine (IsLimit.postcomposeHomEquiv e _).symm.trans
     (IsLimit.equivIsoLimit (Fork.ext (Iso.refl _) ?_))
-  dsimp [Equalizer.forkMap, forkMap, e, Fork.ι]
-  simp only [id_comp, map_lift_piComparison]
+  simp [Equalizer.forkMap, forkMap, e, Fork.ι]
 
 -- Remark : this lemma uses `A'` not `A`; `A'` is `A` but with a universe
 -- restriction. Can it be generalised?

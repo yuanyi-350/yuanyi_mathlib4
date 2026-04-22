@@ -72,18 +72,8 @@ noncomputable def functorEnrichedHomCoyonedaObjEquiv (M : A) (F G : Cᵒᵖ ⥤ 
       let α : Over.mk j'.hom.unop ⟶ Over.mk j.hom.unop := Over.homMk φ.right.unop
         (Quiver.Hom.op_inj (by simp))
       simpa using (g.naturality α.op).symm)
-  left_inv f := by
-    dsimp
-    ext j
-    dsimp
-    simp only [curry_uncurry, end_.lift_π]
-    rfl
-  right_inv g := by
-    dsimp
-    ext j
-    dsimp
-    simp only [uncurry_curry, end_.lift_π]
-    rfl
+  left_inv f := by cat_disch
+  right_inv g := by cat_disch
 
 set_option backward.isDefEq.respectTransparency false in
 lemma functorEnrichedHomCoyonedaObjEquiv_naturality
@@ -131,15 +121,8 @@ open MonoidalClosed.FunctorCategory
 set_option backward.isDefEq.respectTransparency false in
 lemma whiskerLeft {G₁ G₂ : Cᵒᵖ ⥤ A} {g : G₁ ⟶ G₂} (hg : J.W g) (F : Cᵒᵖ ⥤ A) :
     J.W (F ◁ g) := fun H h ↦ by
-  have := hg _ (Presheaf.isSheaf_functorEnrichedHom F H h)
-  rw [← Function.Bijective.of_comp_iff' (f := MonoidalClosed.curry)
-    ((ihom.adjunction _).homEquiv _ _).bijective]
-  rw [← Function.Bijective.of_comp_iff (g := MonoidalClosed.curry) _
-    ((ihom.adjunction _).homEquiv _ _).bijective] at this
-  convert this using 1
-  ext α : 1
-  dsimp
-  rw [curry_natural_left]
+  exact ((ihom.adjunction F).map_comp_bijective_iff g H).2
+    (hg _ (Presheaf.isSheaf_functorEnrichedHom F H h))
 
 lemma whiskerRight [BraidedCategory A]
     {F₁ F₂ : Cᵒᵖ ⥤ A} {f : F₁ ⟶ F₂} (hf : J.W f) (G : Cᵒᵖ ⥤ A) :

@@ -124,21 +124,13 @@ def actionOfMonoidalFunctorToEndofunctorMop (F : C ⥤ (D ⥤ D)ᴹᵒᵖ) [F.Mo
     simp only [Category.comp_id] at e
     simp [e]
   leftUnitor_actionHom c d := by
-    have e := (F.map (λ_ c).hom).unmop.app d ≫=
-      (congrArg (fun t ↦ t.unmop.app d) <|
-        Functor.OplaxMonoidal.left_unitality F c)
+    have e := congrArg (fun t ↦ t.unmop.app d) (Functor.OplaxMonoidal.left_unitality_hom F c)
     dsimp at e
-    simp only [Category.comp_id, ← NatTrans.comp_app_assoc, ← unmop_comp,
-      ← F.map_comp_assoc, Iso.hom_inv_id, Functor.map_id, Category.id_comp] at e
-    simp [e]
+    simpa using e.symm
   rightUnitor_actionHom c d := by
-    have e := (F.map (ρ_ c).hom).unmop.app d ≫=
-      (congrArg (fun t ↦ t.unmop.app d) <|
-        Functor.OplaxMonoidal.right_unitality F c)
+    have e := congrArg (fun t ↦ t.unmop.app d) (Functor.OplaxMonoidal.right_unitality_hom F c)
     dsimp at e
-    simp only [Category.comp_id, ← NatTrans.comp_app_assoc, ← unmop_comp,
-      ← F.map_comp_assoc, Iso.hom_inv_id, Functor.map_id, Category.id_comp] at e
-    simp [e]
+    simpa using e.symm
 
 /-- If the (left) action of `C` on `D` comes from a monoidal functor
 `C ⥤ (D ⥤ D)ᴹᵒᵖ`, then `curriedActionMop C D` is naturally isomorphic to that

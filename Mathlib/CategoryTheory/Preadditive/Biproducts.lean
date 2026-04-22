@@ -285,19 +285,13 @@ def biproduct.reindex {β γ : Type} [Finite β] (ε : β ≃ γ)
   hom := biproduct.desc fun b => biproduct.ι f (ε b)
   inv := biproduct.lift fun b => biproduct.π f (ε b)
   hom_inv_id := by
-    ext b b'
-    by_cases h : b' = b
-    · subst h; simp
-    · have : ε b' ≠ ε b := by simp [h]
-      simp [biproduct.ι_π_ne _ h, biproduct.ι_π_ne _ this]
+    have h := (biproduct.whiskerEquiv (f := f ∘ ε) (g := f) ε (fun b => Iso.refl _)).hom_inv_id
+    rw [biproduct.whiskerEquiv_inv_eq_lift] at h
+    simpa using h
   inv_hom_id := by
-    classical
-    cases nonempty_fintype β
-    ext g g'
-    by_cases h : g' = g <;>
-      simp [Preadditive.sum_comp, biproduct.lift_desc,
-        biproduct.ι_π, comp_dite, Equiv.apply_eq_iff_eq_symm_apply,
-        h]
+    have h := (biproduct.whiskerEquiv (f := f ∘ ε) (g := f) ε (fun b => Iso.refl _)).inv_hom_id
+    rw [biproduct.whiskerEquiv_inv_eq_lift] at h
+    simpa using h
 
 /-- In a preadditive category, we can construct a binary biproduct for `X Y : C` from
 any binary bicone `b` satisfying `total : b.fst ≫ b.inl + b.snd ≫ b.inr = 𝟙 b.X`.
@@ -803,23 +797,10 @@ theorem Biprod.column_nonzero_of_iso {W X Y Z : C} (f : W ⊞ X ⟶ Y ⊞ Z) [Is
   set x := biprod.inl ≫ f ≫ inv f ≫ biprod.fst
   have h₁ : x = 𝟙 W := by simp [x]
   have h₀ : x = 0 := by
-    dsimp [x]
+    simp only [x]
     rw [← Category.id_comp (inv f), Category.assoc, ← biprod.total]
-    conv_lhs =>
-      slice 2 3
-      rw [comp_add]
-    simp only [Category.assoc]
-    rw [comp_add_assoc, add_comp]
-    conv_lhs =>
-      congr
-      next => skip
-      slice 1 3
-      rw [a₂]
-    simp only [zero_comp, add_zero]
-    conv_lhs =>
-      slice 1 3
-      rw [a₁]
-    simp only [zero_comp]
+    simp only [Category.assoc, comp_add, add_comp, reassoc_of% a₁, reassoc_of% a₂, zero_comp,
+      add_zero]
   exact nz (h₁.symm.trans h₀)
 
 end

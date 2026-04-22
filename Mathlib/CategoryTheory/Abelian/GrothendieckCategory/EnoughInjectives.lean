@@ -323,13 +323,9 @@ instance : HasSmallObjectArgument.{w} (generatingMonomorphisms G) := by
   exact ⟨κ, inferInstance, inferInstance,
     { preservesColimit {A B X Y} i hi f hf := by
         let hf' : (monomorphisms C).TransfiniteCompositionOfShape κ.ord.ToType f :=
-          { toTransfiniteCompositionOfShape := hf.toTransfiniteCompositionOfShape
-            map_mem j hj := by
-              have := (hf.attachCells j hj).pushouts_coproducts
-              simp only [ofHoms_homFamily] at this
-              refine (?_ : _ ≤ monomorphisms C) _ this
-              simp only [pushouts_le_iff, coproducts_le_iff]
-              exact generatingMonomorphisms_le_monomorphisms G }
+          (hf.transfiniteCompositionOfShape _).ofLE (by
+            simpa only [ofHoms_homFamily, pushouts_le_iff, coproducts_le_iff] using
+              (generatingMonomorphisms_le_monomorphisms (C := C) G))
         have (j j' : κ.ord.ToType) (φ : j ⟶ j') : Mono (hf'.F.map φ) := hf'.mem_map φ
         apply preservesColimit_coyoneda_obj_of_mono (Y := hf'.F) (κ := κ)
         obtain ⟨S⟩ := hi
@@ -339,13 +335,7 @@ lemma llp_rlp_monomorphisms (hG : IsSeparator G) :
     (monomorphisms C).rlp.llp = monomorphisms C := by
   refine le_antisymm ?_ (le_llp_rlp _)
   rw [← generatingMonomorphisms_rlp hG, llp_rlp_of_hasSmallObjectArgument]
-  trans (transfiniteCompositions.{w} (coproducts.{w} (monomorphisms C)).pushouts).retracts
-  · apply retracts_monotone
-    apply transfiniteCompositions_monotone
-    apply pushouts_monotone
-    apply coproducts_monotone
-    apply generatingMonomorphisms_le_monomorphisms
-  · simp
+  simpa using (generatingMonomorphisms_le_monomorphisms (C := C) G)
 
 instance : HasFunctorialFactorization (monomorphisms C) (monomorphisms C).rlp := by
   have hG := isSeparator_separator C

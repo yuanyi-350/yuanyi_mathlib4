@@ -182,25 +182,12 @@ instance : SmallCategory Skeleton.{u} where
   comp f g := g ∘ f
 
 theorem is_skeletal : Skeletal Skeleton.{u} := fun X Y ⟨h⟩ =>
-  ext _ _ <|
-    Fin.equiv_iff_eq.mp <|
-      Nonempty.intro <|
-        { toFun := fun x => (h.hom ⟨x⟩).down
-          invFun := fun x => (h.inv ⟨x⟩).down
-          left_inv := by
-            intro a
-            change ULift.down _ = _
-            rw [ULift.up_down]
-            change ((h.hom ≫ h.inv) _).down = _
-            simp
-            rfl
-          right_inv := by
-            intro a
-            change ULift.down _ = _
-            rw [ULift.up_down]
-            change ((h.inv ≫ h.hom) _).down = _
-            simp
-            rfl }
+  let e : ULift (Fin X.len) ≅ ULift (Fin Y.len) :=
+    { hom := h.hom
+      inv := h.inv
+      hom_inv_id := h.hom_inv_id
+      inv_hom_id := h.inv_hom_id }
+  ext _ _ <| Fin.equiv_iff_eq.mp ⟨Equiv.ulift.symm.trans (e.toEquiv.trans Equiv.ulift)⟩
 
 /-- The canonical fully faithful embedding of `FintypeCat.Skeleton` into `FintypeCat`. -/
 def incl : Skeleton.{u} ⥤ FintypeCat.{u} where
@@ -215,11 +202,7 @@ instance : incl.Faithful where
 instance : incl.EssSurj :=
   Functor.EssSurj.mk fun X =>
     letI := X.fintype
-    let F := Fintype.equivFin X
-    ⟨mk (Fintype.card X),
-      Nonempty.intro
-        { hom := homMk (F.symm ∘ ULift.down)
-          inv := homMk (ULift.up ∘ F) }⟩
+    ⟨mk (Fintype.card X), ⟨equivEquivIso (Equiv.ulift.trans (Fintype.equivFin X).symm)⟩⟩
 
 noncomputable instance : incl.IsEquivalence where
 

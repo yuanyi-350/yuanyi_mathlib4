@@ -119,6 +119,7 @@ variable
   [∀ (v : V) (d : C),
     Limits.PreservesColimitsOfShape (CostructuredArrow (tensor C) d) (tensorRight v)]
 
+set_option linter.flexible false in
 set_option backward.isDefEq.respectTransparency false in
 variable (F G) in
 lemma hexagon_forward (H : C ⥤ V)
@@ -134,14 +135,7 @@ lemma hexagon_forward (H : C ⥤ V)
     (ExternalProduct.extensionUnitLeft (F ⊛ G) (unit F G) H)
   ext ⟨⟨x, y⟩, z⟩
   dsimp
-  simp only [whiskerLeft_id, Category.comp_id, associator_hom_unit_unit_assoc,
-    externalProductBifunctor_obj_obj, tensor_obj, NatTrans.naturality_assoc,
-    NatTrans.naturality, unit_app_braiding_hom_app_assoc,
-    BraidedCategory.braiding_tensor_left_hom, Functor.map_comp, Category.assoc,
-    Iso.map_hom_inv_id, BraidedCategory.braiding_naturality_right_assoc,
-    BraidedCategory.braiding_tensor_right_hom, Iso.map_inv_hom_id_assoc,
-    Iso.inv_hom_id_assoc, Iso.hom_inv_id_assoc, unit_app_map_app_assoc,
-    NatTrans.id_app, tensorHom_id]
+  simp
   simp only [← comp_whiskerRight_assoc, ← whiskerLeft_comp_assoc,
     unit_app_braiding_hom_app]
   simp only [whiskerLeft_comp, ← Functor.map_comp, Category.assoc,
@@ -157,6 +151,7 @@ lemma hexagon_forward (H : C ⥤ V)
   rw [← this, whiskerLeft_comp_assoc]
   simp [← Functor.map_comp]
 
+set_option linter.flexible false in
 set_option backward.isDefEq.respectTransparency false in
 variable (F G) in
 lemma hexagon_reverse (H : C ⥤ V)
@@ -172,16 +167,7 @@ lemma hexagon_reverse (H : C ⥤ V)
     (ExternalProduct.extensionUnitRight (G ⊛ H) (unit G H) F)
   ext ⟨x, y, z⟩
   dsimp
-  simp only [whiskerRight_tensor, id_whiskerRight, Category.id_comp,
-    Iso.inv_hom_id, associator_inv_unit_unit_assoc,
-    externalProductBifunctor_obj_obj, tensor_obj, NatTrans.naturality_assoc,
-    NatTrans.naturality, unit_app_braiding_hom_app_assoc,
-    BraidedCategory.braiding_tensor_right_hom, Functor.map_comp, Category.assoc,
-    Iso.map_inv_hom_id, Category.comp_id,
-    BraidedCategory.braiding_naturality_left_assoc,
-    BraidedCategory.braiding_tensor_left_hom, Iso.map_hom_inv_id_assoc,
-    Iso.hom_inv_id_assoc, Iso.inv_hom_id_assoc, unit_app_map_app_assoc,
-    NatTrans.id_app, id_tensorHom]
+  simp
   simp only [← comp_whiskerRight_assoc, ← whiskerLeft_comp_assoc,
     unit_app_braiding_hom_app]
   simp only [comp_whiskerRight, ← Functor.map_comp, Category.assoc, Functor.comp_obj, tensor_obj,

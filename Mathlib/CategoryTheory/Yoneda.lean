@@ -815,11 +815,7 @@ def largeCurriedYonedaLemma {C : Type u₁} [Category.{v₁} C] :
   NatIso.ofComponents
     (fun X => NatIso.ofComponents
       (fun _ => Equiv.toIso <| yonedaEquiv.trans Equiv.ulift.symm)
-      (by
-        intro Y Z f
-        ext g
-        rw [← ULift.down_inj]
-        simpa using yonedaEquiv_comp _ _))
+      (by cat_disch))
     (by
       intro Y Z f
       ext F g
@@ -924,11 +920,7 @@ def uliftYonedaOpCompCoyoneda {C : Type u₁} [Category.{v₁} C] :
   NatIso.ofComponents
     (fun X => NatIso.ofComponents
       (fun _ => Equiv.toIso <| uliftYonedaEquiv.trans Equiv.ulift.symm)
-      (by
-        intros Y Z f
-        ext g
-        rw [← ULift.down_inj]
-        simpa using uliftYonedaEquiv_comp _ _))
+      (by cat_disch))
     (by
       intros Y Z f
       ext F g
@@ -1050,11 +1042,7 @@ def largeCurriedCoyonedaLemma {C : Type u₁} [Category.{v₁} C] :
   NatIso.ofComponents
     (fun X => NatIso.ofComponents
       (fun _ => Equiv.toIso <| coyonedaEquiv.trans Equiv.ulift.symm)
-      (by
-        intro Y Z f
-        ext g
-        rw [← ULift.down_inj]
-        simpa using coyonedaEquiv_comp _ _))
+      (by cat_disch))
     (by
       intro Y Z f
       ext F g
@@ -1154,11 +1142,7 @@ def uliftCoyonedaRightOpCompCoyoneda {C : Type u₁} [Category.{v₁} C] :
   NatIso.ofComponents
     (fun X => NatIso.ofComponents
       (fun _ => Equiv.toIso <| uliftCoyonedaEquiv.trans Equiv.ulift.symm)
-      (by
-        intros Y Z f
-        ext g
-        rw [← ULift.down_inj]
-        simpa using uliftCoyonedaEquiv_comp _ _))
+      (by cat_disch))
     (by
       intros Y Z f
       ext F g

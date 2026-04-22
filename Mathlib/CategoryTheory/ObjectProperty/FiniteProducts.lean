@@ -108,12 +108,8 @@ instance [P.ContainsZero] [P.IsClosedUnderIsomorphisms] :
     P.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty) where
   limitsOfShape_le := by
     rintro X ⟨p⟩
-    obtain ⟨Z, hZ, hZ₂⟩ := P.exists_prop_of_containsZero
-    have hX : IsTerminal X :=
-      (IsLimit.equivOfNatIsoOfIso p.diag.uniqueFromEmpty _ _
-        (by exact Cone.ext (Iso.refl _) (by rintro ⟨⟨⟩⟩))).1 p.isLimit
-    exact P.prop_of_isZero (IsZero.of_iso hZ
-      (IsLimit.conePointUniqueUpToIso hX (IsZero.isTerminal hZ)))
+    letI := P.exists_prop_of_containsZero.choose_spec.1.hasZeroMorphisms
+    exact P.prop_of_isZero (((isLimitEquivIsTerminalOfIsEmpty C p.cone).1 p.isLimit).isZero)
 
 variable {P} in
 lemma IsClosedUnderFiniteProducts.mk' [HasFiniteProducts C]
@@ -202,12 +198,8 @@ instance [P.ContainsZero] [P.IsClosedUnderIsomorphisms] :
     P.IsClosedUnderColimitsOfShape (Discrete.{0} PEmpty) where
   colimitsOfShape_le := by
     rintro X ⟨p⟩
-    obtain ⟨Z, hZ, hZ₂⟩ := P.exists_prop_of_containsZero
-    have hX : IsInitial X :=
-      (IsColimit.equivOfNatIsoOfIso p.diag.uniqueFromEmpty _ _
-        (by exact Cocone.ext (Iso.refl _) (by rintro ⟨⟨⟩⟩))).1 p.isColimit
-    exact P.prop_of_isZero (IsZero.of_iso hZ
-      (IsColimit.coconePointUniqueUpToIso hX (IsZero.isInitial hZ)))
+    letI := P.exists_prop_of_containsZero.choose_spec.1.hasZeroMorphisms
+    exact P.prop_of_isZero (((isColimitEquivIsInitialOfIsEmpty C p.cocone).1 p.isColimit).isZero)
 
 variable {P} in
 lemma IsClosedUnderFiniteCoproducts.mk' [HasFiniteCoproducts C]

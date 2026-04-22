@@ -91,12 +91,8 @@ noncomputable def colimitConstPUnitIsoPUnit [IsConnected C] :
 /-- Let `F` be a `Type`-valued functor. If two elements `a : F c` and `b : F d` represent the same
 element of `colimit F`, then `c` and `d` are related by a `Zigzag`. -/
 theorem zigzag_of_eqvGen_colimitTypeRel (F : C ⥤ Type w) (c d : Σ j, F.obj j)
-    (h : Relation.EqvGen F.ColimitTypeRel c d) : Zigzag c.1 d.1 := by
-  induction h with
-  | rel _ _ h => exact Zigzag.of_hom <| Exists.choose h
-  | refl _ => exact Zigzag.refl _
-  | symm _ _ _ ih => exact zigzag_symmetric ih
-  | trans _ _ _ _ _ ih₁ ih₂ => exact ih₁.trans ih₂
+    (h : Relation.EqvGen F.ColimitTypeRel c d) : Zigzag c.1 d.1 :=
+  (zigzag_equivalence.comap Sigma.fst).eqvGen_iff.1 <| h.mono fun _ _ h => Zigzag.of_hom h.choose
 
 /-- An index category is connected iff the colimit of the constant singleton-valued functor is a
 singleton. -/
@@ -148,22 +144,12 @@ variable (C : Type*) [Category* C]
 /-- Prove that a category is connected by supplying an explicit initial object. -/
 lemma isConnected_of_isInitial {x : C} (h : Limits.IsInitial x) : IsConnected C := by
   letI : Nonempty C := ⟨x⟩
-  apply isConnected_of_zigzag
-  intro j₁ j₂
-  use [x, j₂]
-  simp only [List.isChain_cons_cons, List.isChain_singleton, and_true, ne_eq,
-    reduceCtorEq, not_false_eq_true, List.getLast_cons, List.cons_ne_self, List.getLast_singleton]
-  exact ⟨Zag.symm <| Zag.of_hom <| h.to _, Zag.of_hom <| h.to _⟩
+  exact zigzag_isConnected fun j₁ j₂ => Zigzag.of_inv_hom (h.to j₁) (h.to j₂)
 
 /-- Prove that a category is connected by supplying an explicit terminal object. -/
 lemma isConnected_of_isTerminal {x : C} (h : Limits.IsTerminal x) : IsConnected C := by
   letI : Nonempty C := ⟨x⟩
-  apply isConnected_of_zigzag
-  intro j₁ j₂
-  use [x, j₂]
-  simp only [List.isChain_cons_cons, List.isChain_singleton, and_true, ne_eq,
-    reduceCtorEq, not_false_eq_true, List.getLast_cons, List.cons_ne_self, List.getLast_singleton]
-  exact ⟨Zag.of_hom <| h.from _, Zag.symm <| Zag.of_hom <| h.from _⟩
+  exact zigzag_isConnected fun j₁ j₂ => Zigzag.of_hom_inv (h.from j₁) (h.from j₂)
 
 -- note : it seems making the following two as instances breaks things, so these are lemmas.
 lemma isConnected_of_hasInitial [Limits.HasInitial C] : IsConnected C :=

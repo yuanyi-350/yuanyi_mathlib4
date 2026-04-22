@@ -108,50 +108,16 @@ lemma shift_ge (a n n' : ℤ) (hn' : a + n = n') :
     exact t.ge_shift _ _ _ hn' X hX
 
 lemma le_monotone : Monotone t.le := by
-  let H := fun (a : ℕ) => ∀ (n : ℤ), t.le n ≤ t.le (n + a)
-  suffices ∀ (a : ℕ), H a by
-    intro n₀ n₁ h
-    obtain ⟨a, ha⟩ := Int.nonneg_def.1 h
-    obtain rfl : n₁ = n₀ + a := by lia
-    apply this
-  have H_zero : H 0 := fun n => by
-    simp only [Nat.cast_zero, add_zero]
-    rfl
-  have H_one : H 1 := fun n X hX => by
-    rw [← t.shift_le n 1 (n + (1 : ℕ)) rfl, ObjectProperty.prop_shift_iff]
+  exact monotone_int_of_le_succ fun n X hX => by
+    rw [← t.shift_le n 1 (n + 1) rfl, ObjectProperty.prop_shift_iff]
     rw [← t.shift_le n 0 n (add_zero n), ObjectProperty.prop_shift_iff] at hX
     exact t.le_zero_le _ hX
-  have H_add : ∀ (a b c : ℕ) (_ : a + b = c) (_ : H a) (_ : H b), H c := by
-    intro a b c h ha hb n
-    rw [← h, Nat.cast_add, ← add_assoc]
-    exact (ha n).trans (hb (n + a))
-  intro a
-  induction a with
-  | zero => exact H_zero
-  | succ a ha => exact H_add a 1 _ rfl ha H_one
 
 lemma ge_antitone : Antitone t.ge := by
-  let H := fun (a : ℕ) => ∀ (n : ℤ), t.ge (n + a) ≤ t.ge n
-  suffices ∀ (a : ℕ), H a by
-    intro n₀ n₁ h
-    obtain ⟨a, ha⟩ := Int.nonneg_def.1 h
-    obtain rfl : n₁ = n₀ + a := by lia
-    apply this
-  have H_zero : H 0 := fun n => by
-    simp only [Nat.cast_zero, add_zero]
-    rfl
-  have H_one : H 1 := fun n X hX => by
-    rw [← t.shift_ge n 1 (n + (1 : ℕ)) (by simp), ObjectProperty.prop_shift_iff] at hX
+  exact antitone_int_of_succ_le fun n X hX => by
+    rw [← t.shift_ge n 1 (n + 1) rfl, ObjectProperty.prop_shift_iff] at hX
     rw [← t.shift_ge n 0 n (add_zero n)]
     exact t.ge_one_le _ hX
-  have H_add : ∀ (a b c : ℕ) (_ : a + b = c) (_ : H a) (_ : H b), H c := by
-    intro a b c h ha hb n
-    rw [← h, Nat.cast_add, ← add_assoc]
-    exact (hb (n + a)).trans (ha n)
-  intro a
-  induction a with
-  | zero => exact H_zero
-  | succ a ha => exact H_add a 1 _ rfl ha H_one
 
 /-- Given a t-structure `t` on a pretriangulated category `C`, the property `t.IsLE X n`
 holds if `X : C` is `≤ n` for the t-structure. -/
@@ -239,11 +205,7 @@ lemma zero {X Y : C} (f : X ⟶ Y) (n₀ n₁ : ℤ) (h : n₀ < n₁ := by lia)
   have := t.isLE_shift X n₀ n₀ 0 (add_zero n₀)
   have := t.isGE_shift Y n₁ n₀ (n₁ - n₀)
   have := t.isGE_of_ge (Y⟦n₀⟧) 1 (n₁ - n₀)
-  apply (shiftFunctor C n₀).map_injective
-  simp only [Functor.map_zero]
-  apply t.zero'
-  · apply t.le_of_isLE
-  · apply t.ge_of_isGE
+  exact (shiftFunctor C n₀).zero_of_map_zero f <| t.zero' _ (t.le_of_isLE _ _) (t.ge_of_isGE _ _)
 
 lemma zero_of_isLE_of_isGE {X Y : C} (f : X ⟶ Y) (n₀ n₁ : ℤ) (h : n₀ < n₁)
     (_ : t.IsLE X n₀) (_ : t.IsGE Y n₁) : f = 0 :=

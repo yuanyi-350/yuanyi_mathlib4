@@ -159,13 +159,9 @@ def adj : T.free ⊣ T.forget :=
           invFun := fun f =>
             { f := T.map f ≫ Y.a
               h := by simp [← Y.assoc, ← T.μ.naturality_assoc] }
-          left_inv := fun f => by
-            ext
-            simp
+          left_inv := fun f => by cat_disch
           right_inv := fun f => by
-            dsimp only [forget_obj]
-            rw [← T.η.naturality_assoc, Y.unit]
-            apply Category.comp_id } }
+            simp [← T.η.naturality_assoc, Y.unit] } }
 
 /-- Given an algebra morphism whose carrier part is an isomorphism, we get an algebra isomorphism.
 -/
@@ -371,21 +367,13 @@ def adj : G.forget ⊣ G.cofree :=
               h := by simp [← Coalgebra.coassoc_assoc] }
           invFun := fun g => g.f ≫ G.ε.app Y
           left_inv := fun f => by
-            dsimp
-            rw [Category.assoc, G.ε.naturality, Functor.id_map, X.counit_assoc]
-          right_inv := fun g => by
-            ext1; dsimp
-            rw [Functor.map_comp, g.h_assoc, cofree_obj_a, Comonad.right_counit]
-            apply comp_id } }
+            simp [X.counit_assoc]
+          right_inv := fun g => by cat_disch } }
 
 /-- Given a coalgebra morphism whose carrier part is an isomorphism, we get a coalgebra isomorphism.
 -/
 theorem coalgebra_iso_of_iso {A B : Coalgebra G} (f : A ⟶ B) [IsIso f.f] : IsIso f :=
-  ⟨⟨{   f := inv f.f
-        h := by
-          rw [IsIso.eq_inv_comp f.f, ← f.h_assoc]
-          simp },
-      by cat_disch⟩⟩
+  by simpa using (Coalgebra.isoMk (asIso f.f) f.h).isIso_hom
 
 instance forget_reflects_iso : G.forget.ReflectsIsomorphisms where
   reflects {_ _} f [IsIso f.f] := coalgebra_iso_of_iso G f

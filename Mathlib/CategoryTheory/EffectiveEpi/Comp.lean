@@ -34,17 +34,9 @@ def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi' {α : Type*} {B : C} {X 
     (hi : ∀ a, i a ≫ g a = 𝟙 _) [EffectiveEpiFamily _ f] :
     EffectiveEpiFamilyStruct _ (fun a ↦ g a ≫ f a) where
   desc e w := EffectiveEpiFamily.desc _ f (fun a ↦ i a ≫ e a) fun a₁ a₂ g₁ g₂ _ ↦ (by
-    simp only [← Category.assoc]
-    apply w _ _ (g₁ ≫ i a₁) (g₂ ≫ i a₂)
-    simp only [Category.assoc]
-    simp only [← Category.assoc, hi]
-    simpa)
+    grind)
   fac e w a := by
-    simp only [Category.assoc, EffectiveEpiFamily.fac]
-    rw [← Category.id_comp (e a), ← Category.assoc, ← Category.assoc]
-    apply w
-    simp only [Category.comp_id, Category.id_comp, ← Category.assoc]
-    aesop
+    simpa using w a a (g a ≫ i a) (𝟙 _) (by grind)
   uniq _ _ _ hm := by
     apply EffectiveEpiFamily.uniq _ f
     intro a

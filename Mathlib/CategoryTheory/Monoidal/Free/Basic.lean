@@ -311,48 +311,10 @@ set_option backward.isDefEq.respectTransparency false in
 def projectMap (X Y : F C) : (X ⟶ Y) → (projectObj f X ⟶ projectObj f Y) :=
   Quotient.lift (projectMapAux f) <| by
     intro f g h
-    induction h with
-    | refl => rfl
-    | symm _ _ _ hfg' => exact hfg'.symm
-    | trans _ _ hfg hgh => exact hfg.trans hgh
-    | comp _ _ hf hg => dsimp only [projectMapAux]; rw [hf, hg]
-    | whiskerLeft _ _ _ _ hf => dsimp only [projectMapAux, projectObj]; rw [hf]
-    | whiskerRight _ _ _ _ hf => dsimp only [projectMapAux, projectObj]; rw [hf]
-    | tensor _ _ hfg hfg' => dsimp only [projectMapAux]; rw [hfg, hfg']
-    | tensorHom_def _ _ =>
-        dsimp only [projectMapAux, projectObj]; rw [MonoidalCategory.tensorHom_def]
-    | comp_id => dsimp only [projectMapAux]; rw [Category.comp_id]
-    | id_comp => dsimp only [projectMapAux]; rw [Category.id_comp]
-    | assoc => dsimp only [projectMapAux]; rw [Category.assoc]
-    | id_tensorHom_id => dsimp only [projectMapAux]; rw [MonoidalCategory.id_tensorHom_id]; rfl
-    | tensorHom_comp_tensorHom =>
-      dsimp only [projectMapAux]; rw [MonoidalCategory.tensorHom_comp_tensorHom]
-    | whiskerLeft_id =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.whiskerLeft_id]
-    | id_whiskerRight =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.id_whiskerRight]
-    | α_hom_inv => dsimp only [projectMapAux]; rw [Iso.hom_inv_id]
-    | α_inv_hom => dsimp only [projectMapAux]; rw [Iso.inv_hom_id]
-    | associator_naturality =>
-        dsimp only [projectMapAux]; rw [MonoidalCategory.associator_naturality]
-    | ρ_hom_inv => dsimp only [projectMapAux]; rw [Iso.hom_inv_id]
-    | ρ_inv_hom => dsimp only [projectMapAux]; rw [Iso.inv_hom_id]
-    | ρ_naturality =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.rightUnitor_naturality]
-    | l_hom_inv => dsimp only [projectMapAux]; rw [Iso.hom_inv_id]
-    | l_inv_hom => dsimp only [projectMapAux]; rw [Iso.inv_hom_id]
-    | l_naturality =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.leftUnitor_naturality]
-    | pentagon =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.pentagon]
-    | triangle =>
-        dsimp only [projectMapAux, projectObj]
-        rw [MonoidalCategory.triangle]
+    induction h <;>
+      simp_all only [projectMapAux, projectObj, tensor_eq_tensor, unit_eq_unit]
+    case tensorHom_def => exact MonoidalCategory.tensorHom_def _ _
+    all_goals cat_disch
 
 end
 

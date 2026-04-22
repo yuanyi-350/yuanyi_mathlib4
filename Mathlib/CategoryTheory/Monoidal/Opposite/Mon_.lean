@@ -31,27 +31,17 @@ variable (M : C) [MonObj M]
 instance mopMonObj : MonObj (mop M) where
   mul := MonObj.mul.mop
   one := MonObj.one.mop
-  mul_one := by
-    apply mopEquiv C |>.fullyFaithfulInverse.map_injective
-    simp
-  one_mul := by
-    apply mopEquiv C |>.fullyFaithfulInverse.map_injective
-    simp
-  mul_assoc := by
-    apply mopEquiv C |>.fullyFaithfulInverse.map_injective
-    simp
+  mul_one := Quiver.Hom.unmop_inj (by simp)
+  one_mul := Quiver.Hom.unmop_inj (by simp)
+  mul_assoc := Quiver.Hom.unmop_inj (by simp)
 
 variable {M} in
 /-- If `f` is a morphism of monoid objects internal to `C`,
 then `f.mop` is a morphism of monoid objects internal to `Cᴹᵒᵖ`. -/
 instance mop_isMonHom {N : C} [MonObj N]
     (f : M ⟶ N) [IsMonHom f] : IsMonHom f.mop where
-  mul_hom := by
-    apply mopEquiv C |>.fullyFaithfulInverse.map_injective
-    simpa [-IsMonHom.mul_hom] using IsMonHom.mul_hom f
-  one_hom := by
-    apply mopEquiv C |>.fullyFaithfulInverse.map_injective
-    simpa [-IsMonHom.one_hom] using IsMonHom.one_hom f
+  mul_hom := Quiver.Hom.unmop_inj (by simpa [-IsMonHom.mul_hom] using IsMonHom.mul_hom f)
+  one_hom := Quiver.Hom.unmop_inj (by simpa [-IsMonHom.one_hom] using IsMonHom.one_hom f)
 
 end mop
 
@@ -64,27 +54,17 @@ variable (M : Cᴹᵒᵖ) [MonObj M]
 instance unmopMonObj : MonObj (unmop M) where
   mul := MonObj.mul.unmop
   one := MonObj.one.unmop
-  mul_one := by
-    apply mopEquiv C |>.fullyFaithfulFunctor.map_injective
-    simp
-  one_mul := by
-    apply mopEquiv C |>.fullyFaithfulFunctor.map_injective
-    simp
-  mul_assoc := by
-    apply mopEquiv C |>.fullyFaithfulFunctor.map_injective
-    simp
+  mul_one := Quiver.Hom.mop_inj (by simp)
+  one_mul := Quiver.Hom.mop_inj (by simp)
+  mul_assoc := Quiver.Hom.mop_inj (by simp)
 
 variable {M} in
 /-- If `f` is a morphism of monoid objects internal to `Cᴹᵒᵖ`,
 so is `f.unmop`. -/
 instance unmop_isMonHom {N : Cᴹᵒᵖ} [MonObj N]
     (f : M ⟶ N) [IsMonHom f] : IsMonHom f.unmop where
-  mul_hom := by
-    apply mopEquiv C |>.fullyFaithfulFunctor.map_injective
-    simpa [-IsMonHom.mul_hom] using IsMonHom.mul_hom f
-  one_hom := by
-    apply mopEquiv C |>.fullyFaithfulFunctor.map_injective
-    simpa [-IsMonHom.one_hom] using IsMonHom.one_hom f
+  mul_hom := Quiver.Hom.mop_inj (by simpa [-IsMonHom.mul_hom] using IsMonHom.mul_hom f)
+  one_hom := Quiver.Hom.mop_inj (by simpa [-IsMonHom.one_hom] using IsMonHom.one_hom f)
 
 end unmop
 

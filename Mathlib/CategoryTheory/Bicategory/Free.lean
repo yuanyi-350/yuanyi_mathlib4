@@ -331,18 +331,8 @@ def lift : FreeBicategory B ⥤ᵖ C where
   mapId _ := Iso.refl _
   mapComp _ _ := Iso.refl _
   map₂ := Quot.lift (liftHom₂ F) fun _ _ H => liftHom₂_congr F H
-  -- Porting note: We'd really prefer not to be doing this by hand.
-  -- in mathlib3 `tidy` did these inductions for us.
-  map₂_comp := by
-    intro a b f g h η θ
-    induction η using Quot.rec
-    · induction θ using Quot.rec <;> rfl
-    · rfl
-  map₂_whisker_left := by
-    intro a b c f g h η
-    induction η using Quot.rec
-    · cat_disch
-    · rfl
+  map₂_comp := by intro _ _ _ _ _ η θ; exact Quot.induction_on₂ η θ fun _ _ => rfl
+  map₂_whisker_left := by intro _ _ _ _ _ _ η; exact Quot.induction_on η fun _ => by cat_disch
   map₂_whisker_right := by intro _ _ _ _ _ η h; dsimp; induction η using Quot.rec <;> cat_disch
 
 end

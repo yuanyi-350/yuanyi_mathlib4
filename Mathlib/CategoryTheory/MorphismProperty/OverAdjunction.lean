@@ -44,11 +44,7 @@ def Over.map {f : X ⟶ Y} (hPf : P f) : P.Over Q X ⥤ P.Over Q Y :=
 
 lemma Over.map_comp {f : X ⟶ Y} (hf : P f) {g : Y ⟶ Z} (hg : P g) :
     map Q (P.comp_mem f g hf hg) = map Q hf ⋙ map Q hg := by
-  fapply Functor.ext
-  · simp [map, Comma.mapRight, CategoryTheory.Comma.mapRight, Comma.lift]
-  · intro U V k
-    ext
-    simp
+  fapply Functor.ext <;> aesop_cat
 
 /-- Promote an equality to an isomorphism of `Over.map` functors. -/
 @[simps!]
@@ -204,11 +200,7 @@ def Under.map {f : X ⟶ Y} (hPf : P f) : P.Under Q Y ⥤ P.Under Q X :=
 
 lemma Under.map_comp {f : X ⟶ Y} (hf : P f) {g : Y ⟶ Z} (hg : P g) :
     map Q (P.comp_mem f g hf hg) = map Q hg ⋙ map Q hf := by
-  fapply Functor.ext
-  · simp [map, Comma.mapLeft, CategoryTheory.Comma.mapLeft, Comma.lift]
-  · intro U V k
-    ext
-    simp
+  fapply Functor.ext <;> aesop_cat
 
 /-- Promote an equality to an isomorphism of `Under.map` functors. -/
 @[simps!]

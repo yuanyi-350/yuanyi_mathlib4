@@ -345,12 +345,7 @@ which have also been proved in `Mathlib/CategoryTheory/Monoidal/Braided/Basic.le
 lemma one_associator {M N P : C} [MonObj M] [MonObj N] [MonObj P] :
     ((λ_ (𝟙_ C)).inv ≫ ((λ_ (𝟙_ C)).inv ≫ (η[M] ⊗ₘ η[N]) ⊗ₘ η[P])) ≫ (α_ M N P).hom =
       (λ_ (𝟙_ C)).inv ≫ (η[M] ⊗ₘ (λ_ (𝟙_ C)).inv ≫ (η[N] ⊗ₘ η[P])) := by
-  simp only [Category.assoc, Iso.cancel_iso_inv_left]
-  slice_lhs 1 3 => rw [← Category.id_comp (η : 𝟙_ C ⟶ P), ← tensorHom_comp_tensorHom]
-  slice_lhs 2 3 => rw [associator_naturality]
-  slice_rhs 1 2 => rw [← Category.id_comp η, ← tensorHom_comp_tensorHom]
-  slice_lhs 1 2 => rw [tensorHom_id, ← leftUnitor_tensor_inv]
-  simp
+  monoidal
 
 @[to_additive]
 lemma one_leftUnitor {M : C} [MonObj M] :
@@ -423,21 +418,13 @@ lemma mul_associator {M N P : C} [MonObj M] [MonObj N] [MonObj P] :
 lemma mul_leftUnitor {M : C} [MonObj M] :
     (tensorμ (𝟙_ C) M (𝟙_ C) M ≫ ((λ_ (𝟙_ C)).hom ⊗ₘ μ)) ≫ (λ_ M).hom =
       ((λ_ M).hom ⊗ₘ (λ_ M).hom) ≫ μ := by
-  rw [← Category.comp_id (λ_ (𝟙_ C)).hom, ← Category.id_comp μ, ← tensorHom_comp_tensorHom]
-  simp only [tensorHom_id, id_tensorHom]
-  slice_lhs 3 4 => rw [leftUnitor_naturality]
-  slice_lhs 1 3 => rw [← leftUnitor_monoidal]
-  simp only [Category.id_comp]
+  simpa [tensorHom_def, Category.assoc] using (leftUnitor_monoidal_assoc M M μ[M]).symm
 
 @[to_additive]
 lemma mul_rightUnitor {M : C} [MonObj M] :
     (tensorμ M (𝟙_ C) M (𝟙_ C) ≫ (μ ⊗ₘ (λ_ (𝟙_ C)).hom)) ≫ (ρ_ M).hom =
       ((ρ_ M).hom ⊗ₘ (ρ_ M).hom) ≫ μ := by
-  rw [← Category.id_comp μ, ← Category.comp_id (λ_ (𝟙_ C)).hom, ← tensorHom_comp_tensorHom]
-  simp only [tensorHom_id, id_tensorHom]
-  slice_lhs 3 4 => rw [rightUnitor_naturality]
-  slice_lhs 1 3 => rw [← rightUnitor_monoidal]
-  simp only [Category.id_comp]
+  simpa [tensorHom_def', Category.assoc] using (rightUnitor_monoidal_assoc M M μ[M]).symm
 
 namespace tensorObj
 

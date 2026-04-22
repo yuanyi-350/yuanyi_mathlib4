@@ -187,20 +187,12 @@ noncomputable instance {J : Type*} [Category* J] [HasColimitsOfShape J V] :
 noncomputable instance [HasFiniteLimits V] : PreservesFiniteLimits (Action.forget V G) := by
   change PreservesFiniteLimits ((Action.functorCategoryEquivalence V G).functor ⋙
     (evaluation (SingleObj G) V).obj (SingleObj.star G))
-  have : PreservesFiniteLimits ((evaluation (SingleObj G) V).obj (SingleObj.star G)) := by
-    constructor
-    intro _ _ _
-    infer_instance
-  apply comp_preservesFiniteLimits
+  exact comp_preservesFiniteLimits _ _
 
 noncomputable instance [HasFiniteColimits V] : PreservesFiniteColimits (Action.forget V G) := by
   change PreservesFiniteColimits ((Action.functorCategoryEquivalence V G).functor ⋙
     (evaluation (SingleObj G) V).obj (SingleObj.star G))
-  have : PreservesFiniteColimits ((evaluation (SingleObj G) V).obj (SingleObj.star G)) := by
-    constructor
-    intro _ _ _
-    infer_instance
-  apply comp_preservesFiniteColimits
+  exact comp_preservesFiniteColimits _ _
 
 instance {J : Type*} [Category* J] (F : J ⥤ Action V G) :
     ReflectsLimit F (Action.forget V G) where

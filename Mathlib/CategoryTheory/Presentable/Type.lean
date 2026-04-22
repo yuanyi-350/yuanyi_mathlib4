@@ -46,15 +46,8 @@ lemma isCardinalPresentable (hX : HasCardinalLT X κ) [Fact κ.IsRegular] :
       · choose k a hk using fun x ↦
           (Types.FilteredColimit.isColimit_eq_iff' hc _ _).1 (congr_fun h x)
         dsimp at f g h k a hk ⊢
-        obtain ⟨l, b, c, hl⟩ : ∃ (l : J) (c : j ⟶ l) (b : ∀ x, k x ⟶ l),
-            ∀ x, a x ≫ b x = c := by
-          let φ (x : X) : j ⟶ IsCardinalFiltered.max k hX :=
-            a x ≫ IsCardinalFiltered.toMax k hX x
-          exact ⟨IsCardinalFiltered.coeq φ hX,
-            IsCardinalFiltered.toCoeq φ hX,
-            fun x ↦ IsCardinalFiltered.toMax k hX x ≫ IsCardinalFiltered.coeqHom φ hX,
-            fun x ↦ by simpa [φ] using IsCardinalFiltered.coeq_condition φ hX x⟩
-        exact ⟨l, b, by ext x; simp [← hl x, hk]⟩⟩⟩⟩
+        obtain ⟨l, b, c, hl⟩ := IsCardinalFiltered.wideSpan a hX
+        exact ⟨l, c, by ext x; simp [← hl x, hk]⟩⟩⟩⟩
 
 /-- Given `X : Type u` and `κ : Cardinal.{u} X`, this is the preordered type
 of subsets of `X` of cardinality `< κ`. -/
@@ -124,13 +117,7 @@ lemma isCardinalPresentable_iff (κ : Cardinal.{u}) [Fact κ.IsRegular] :
     (isColimitOfPreserves (coyoneda.obj (op X))
       (HasCardinalLT.Set.isColimitCocone X κ
         (Cardinal.IsRegular.aleph0_le Fact.out))) (𝟙 X)
-  obtain rfl : A = .univ := by
-    ext x
-    have := congr_fun hf x
-    dsimp at this
-    rw [← this]
-    simp
-  exact (hasCardinalLT_iff_of_equiv (Equiv.Set.univ X) _).1 hA
+  exact hA.of_surjective Subtype.val (fun x ↦ ⟨f x, congr_fun hf x⟩)
 
 instance (X : Type u) : IsPresentable.{u} X := by
   obtain ⟨κ, hκ, hX⟩ := HasCardinalLT.exists_regular_cardinal.{u} X

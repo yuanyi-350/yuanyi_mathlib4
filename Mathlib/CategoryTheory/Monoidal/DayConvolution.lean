@@ -550,16 +550,11 @@ lemma leftUnitor_hom_unit_app (y : C) :
     can ▷ F.obj y ≫ (DayConvolution.unit U F).app (𝟙_ C, y) ≫
       (leftUnitor U F).hom.app (𝟙_ C ⊗ y) =
     (λ_ (F.obj y)).hom ≫ F.map (λ_ y).inv := by
-  have := congrArg (fun t ↦ t.app (.mk PUnit.unit, y)) <|
+  simpa [leftUnitor, corepresentableByLeft, Functor.CorepresentableBy.ofIso,
+    Functor.corepresentableByEquiv, prod.leftUnitorEquivalence,
+    Functor.FullyFaithful.homEquiv] using congrArg (fun t ↦ t.app (.mk PUnit.unit, y)) <|
       (corepresentableByLeft U F).homEquiv.rightInverse_symm <|
         ((leftUnitorCorepresentingIso F).symm.hom.app F) (𝟙 _)
-  dsimp [leftUnitor, Coyoneda.fullyFaithful, corepresentableByLeft,
-    leftUnitorCorepresentingIso, Functor.CorepresentableBy.ofIso,
-    Functor.corepresentableByEquiv] at this ⊢
-  simp only [whiskerLeft_id, Category.comp_id] at this
-  simp only [Category.comp_id, this]
-  simp [prod.leftUnitorEquivalence, Equivalence.congrLeft, Equivalence.fullyFaithfulFunctor,
-    Functor.FullyFaithful.homEquiv]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp, reassoc]
@@ -599,17 +594,11 @@ lemma rightUnitor_hom_unit_app (x : C) :
     F.obj x ◁ can ≫ (DayConvolution.unit F U).app (x, 𝟙_ C) ≫
       (rightUnitor U F).hom.app (x ⊗ 𝟙_ C) =
     (ρ_ _).hom ≫ F.map (ρ_ x).inv := by
-  have := congrArg (fun t ↦ t.app (x, .mk PUnit.unit)) <|
+  simpa [rightUnitor, corepresentableByRight, Functor.CorepresentableBy.ofIso,
+    Functor.corepresentableByEquiv, prod.rightUnitorEquivalence,
+    Functor.FullyFaithful.homEquiv] using congrArg (fun t ↦ t.app (x, .mk PUnit.unit)) <|
       (corepresentableByRight U F).homEquiv.rightInverse_symm <|
         ((rightUnitorCorepresentingIso F).symm.hom.app F) (𝟙 _)
-  dsimp [rightUnitor, Coyoneda.fullyFaithful, corepresentableByRight,
-    rightUnitorCorepresentingIso, Functor.CorepresentableBy.ofIso,
-    Functor.corepresentableByEquiv] at this ⊢
-  simp only [MonoidalCategory.whiskerRight_id, Category.id_comp, Iso.hom_inv_id,
-    Category.comp_id] at this
-  simp only [Category.comp_id, this]
-  simp [prod.rightUnitorEquivalence, Equivalence.congrLeft, Equivalence.fullyFaithfulFunctor,
-    Functor.FullyFaithful.homEquiv]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp, reassoc]
@@ -833,12 +822,7 @@ lemma ι_map_associator_hom_eq_associator_hom (d d' d'')
     (ι C V D |>.obj d) (ι C V D |>.obj d') (ι C V D |>.obj d'') |>.homEquiv.injective
   dsimp
   ext ⟨⟨x, y⟩, z⟩
-  simp only [externalProductBifunctor_obj_obj, Functor.comp_obj, Functor.prod_obj,
-    tensor_obj, Functor.id_obj, Functor.homEquivOfIsLeftKanExtension_apply_app,
-    externalProductBifunctor_map_app, Functor.leftUnitor_inv_app, whiskerLeft_id,
-    Category.comp_id, corepresentableBy_homEquiv_apply_app,
-    DayConvolution.associator_hom_unit_unit]
-  exact associator_hom_unit_unit V _ _ _ _ _ _
+  simpa using associator_hom_unit_unit V d d' d'' x y z
 
 /-- In a `LawfulDayConvolutionMonoidalCategoryStruct`, `ι.obj (𝟙_ D)`
 is a Day convolution unit. -/

@@ -133,25 +133,12 @@ set_option backward.isDefEq.respectTransparency false in
 @[simps! right]
 def whiskerHom (i : s ⟶ t) {x : B} (h : c ⟶ x) :
     s.whisker h ⟶ t.whisker h :=
-  StructuredArrow.homMk (i.right ▷ h) <| by
-    rw [← cancel_mono (α_ _ _ _).inv]
-    calc
-      _ = (unit s ≫ f ◁ i.right) ▷ h := by simp [-LeftExtension.w]
-      _ = unit t ▷ h := congrArg (· ▷ h) (LeftExtension.w i)
-      _ = _ := by simp
+  (whiskering h).map i
 
 /-- Construct an isomorphism between whiskered extensions. -/
 def whiskerIso (i : s ≅ t) {x : B} (h : c ⟶ x) :
     s.whisker h ≅ t.whisker h :=
-  Iso.mk (whiskerHom i.hom h) (whiskerHom i.inv h)
-    (StructuredArrow.hom_ext _ _ <|
-      calc
-        _ = (i.hom ≫ i.inv).right ▷ h := by simp [-Iso.hom_inv_id]
-        _ = 𝟙 _ := by simp [Iso.hom_inv_id])
-    (StructuredArrow.hom_ext _ _ <|
-      calc
-        _ = (i.inv ≫ i.hom).right ▷ h := by simp [-Iso.inv_hom_id]
-        _ = 𝟙 _ := by simp [Iso.inv_hom_id])
+  (whiskering h).mapIso i
 
 /-- The isomorphism between left extensions induced by a right unitor. -/
 @[simps! hom_right inv_right]
@@ -255,25 +242,12 @@ set_option backward.isDefEq.respectTransparency false in
 @[simps! right]
 def whiskerHom (i : s ⟶ t) {x : B} (h : x ⟶ c) :
     s.whisker h ⟶ t.whisker h :=
-  StructuredArrow.homMk (h ◁ i.right) <| by
-    rw [← cancel_mono (α_ h _ _).hom]
-    calc
-      _ = h ◁ (unit s ≫ i.right ▷ f) := by simp [-LeftLift.w]
-      _ = h ◁ unit t := congrArg (h ◁ ·) (LeftLift.w i)
-      _ = _ := by simp
+  (whiskering h).map i
 
 /-- Construct an isomorphism between whiskered lifts. -/
 def whiskerIso (i : s ≅ t) {x : B} (h : x ⟶ c) :
     s.whisker h ≅ t.whisker h :=
-  Iso.mk (whiskerHom i.hom h) (whiskerHom i.inv h)
-    (StructuredArrow.hom_ext _ _ <|
-      calc
-        _ = h ◁ (i.hom ≫ i.inv).right := by simp [-Iso.hom_inv_id]
-        _ = 𝟙 _ := by simp [Iso.hom_inv_id])
-    (StructuredArrow.hom_ext _ _ <|
-      calc
-        _ = h ◁ (i.inv ≫ i.hom).right := by simp [-Iso.inv_hom_id]
-        _ = 𝟙 _ := by simp [Iso.inv_hom_id])
+  (whiskering h).mapIso i
 
 /-- The isomorphism between left lifts induced by a left unitor. -/
 @[simps! hom_right inv_right]

@@ -56,29 +56,8 @@ def module' (hr : ∀ (a : R) ⦃X Y : C⦄ (f₁ f₂ : X ⟶ Y) (_ : r f₁ f�
     [Preadditive (Quotient r)] [(functor r).Additive] (X Y : C) :
     Module R ((functor r).obj X ⟶ (functor r).obj Y) :=
   letI smul := smul r hr ((functor r).obj X) ((functor r).obj Y)
-  { smul_zero := fun a => by
-      rw [← (functor r).map_zero X Y, smul_eq, smul_zero]
-    zero_smul := fun f => by
-      obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-      dsimp [smul]
-      rw [zero_smul, Functor.map_zero]
-    one_smul := fun f => by
-      obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-      dsimp [smul]
-      rw [one_smul]
-    mul_smul := fun a b f => by
-      obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-      dsimp [smul]
-      rw [mul_smul]
-    smul_add := fun a f g => by
-      obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-      obtain ⟨g, rfl⟩ := (functor r).map_surjective g
-      dsimp [smul]
-      rw [← (functor r).map_add, smul_eq, ← (functor r).map_add, smul_add]
-    add_smul := fun a b f => by
-      obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-      dsimp [smul]
-      rw [add_smul, Functor.map_add] }
+  Function.Surjective.module R (functor r).mapAddHom (functor r).map_surjective fun a f => by
+    exact (smul_eq r hr a f).symm
 
 /-- Auxiliary definition for `Quotient.linear`. -/
 @[implicit_reducible]
@@ -102,16 +81,12 @@ def linear (hr : ∀ (a : R) ⦃X Y : C⦄ (f₁ f₂ : X ⟶ Y) (_ : r f₁ f�
   exact
     { smul_comp := by
         rintro ⟨X⟩ ⟨Y⟩ ⟨Z⟩ a f g
-        obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-        obtain ⟨g, rfl⟩ := (functor r).map_surjective g
-        rw [Linear.smul_eq, ← Functor.map_comp, ← Functor.map_comp,
-          Linear.smul_eq, Linear.smul_comp]
+        exact Quot.inductionOn f fun f => Quot.inductionOn g fun g =>
+          congr_arg (functor r).map (Linear.smul_comp X Y Z a f g)
       comp_smul := by
         rintro ⟨X⟩ ⟨Y⟩ ⟨Z⟩ f a g
-        obtain ⟨f, rfl⟩ := (functor r).map_surjective f
-        obtain ⟨g, rfl⟩ := (functor r).map_surjective g
-        rw [Linear.smul_eq, ← Functor.map_comp, ← Functor.map_comp,
-          Linear.smul_eq, Linear.comp_smul] }
+        exact Quot.inductionOn f fun f => Quot.inductionOn g fun g =>
+          congr_arg (functor r).map (Linear.comp_smul X Y Z f a g) }
 
 instance linear_functor
     (hr : ∀ (a : R) ⦃X Y : C⦄ (f₁ f₂ : X ⟶ Y) (_ : r f₁ f₂), r (a • f₁) (a • f₂))

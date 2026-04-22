@@ -405,22 +405,8 @@ This ought to be modelled as a 2-functor!
 def typeToCat : Type u ⥤ Cat where
   obj X := Cat.of (Discrete X)
   map f := (Discrete.functor (Discrete.mk ∘ f)).toCatHom
-  map_id X := by
-    ext
-    simp only [Cat.of_α, toCatHom_toFunctor, Cat.Hom.id_toFunctor]
-    fapply Functor.ext
-    · simp
-    · intro X Y f
-      cases f
-      simp only [Discrete.functor_obj_eq_as, Function.comp_apply, types_id_apply, Discrete.mk_as,
-        id_obj, eqToHom_refl, Functor.id_map, Category.comp_id, Category.id_comp]
-      apply ULift.ext
-      cat_disch
-  map_comp f g := by
-    ext
-    simp only [Cat.of_α, toCatHom_toFunctor, Cat.Hom.comp_toFunctor]
-    apply Functor.ext
-    cat_disch
+  map_id _ := congrArg Functor.toCatHom <| Discrete.functor_ext (fun _ => rfl)
+  map_comp _ _ := congrArg Functor.toCatHom <| Discrete.functor_ext (fun _ => rfl)
 
 instance : Functor.Faithful typeToCat.{u} where
   map_injective {_X} {_Y} _f _g h :=
@@ -428,14 +414,8 @@ instance : Functor.Faithful typeToCat.{u} where
 
 instance : Functor.Full typeToCat.{u} where
   map_surjective F := ⟨Discrete.as ∘ F.toFunctor.obj ∘ Discrete.mk, by
-    ext
-    apply Functor.ext
-    · intro x y f
-      dsimp
-      apply ULift.ext
-      cat_disch
-    · rintro ⟨x⟩
+    exact congrArg Functor.toCatHom <| Discrete.functor_ext (fun _ => by
       apply Discrete.ext
-      rfl⟩
+      rfl)⟩
 
 end CategoryTheory

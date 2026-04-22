@@ -141,13 +141,8 @@ theorem lift_toPath {C} [Category* C] (φ : V ⥤q C) {X Y : V} (f : X ⟶ Y) :
   simp
 
 theorem lift_spec {C} [Category* C] (φ : V ⥤q C) : of V ⋙q (lift φ).toPrefunctor = φ := by
-  fapply Prefunctor.ext
-  · rintro X
-    rfl
-  · rintro X Y f
-    rcases φ with ⟨φo, φm⟩
-    dsimp [lift, Quiver.Hom.toPath]
-    simp
+  ext X Y f <;>
+    simp [lift, Quiver.Hom.toPath]
 
 set_option backward.isDefEq.respectTransparency false in
 theorem lift_unique {C} [Category* C] (φ : V ⥤q C) (Φ : Paths V ⥤ C)
@@ -159,16 +154,10 @@ theorem lift_unique {C} [Category* C] (φ : V ⥤q C) (Φ : Paths V ⥤ C)
   · rintro X Y f
     dsimp [lift]
     induction f with
-    | nil =>
-      simp only [Category.comp_id]
-      apply Functor.map_id
+    | nil => simpa only [Category.id_comp, Category.comp_id] using (Functor.map_id Φ X)
     | cons p f' ih =>
-      simp only [Category.comp_id, Category.id_comp] at ih ⊢
-      -- Porting note: Had to do substitute `p.cons f'` and `f'.toPath` by their fully qualified
-      -- versions in this `have` clause (elsewhere too).
-      have : Φ.map (Quiver.Path.cons p f') = Φ.map p ≫ Φ.map (Quiver.Hom.toPath f') := by
-        convert Functor.map_comp Φ p (Quiver.Hom.toPath f')
-      rw [this, ih]
+      simpa only [Category.id_comp, Category.comp_id, Category.assoc, ih, Quiver.Hom.toPath] using
+        (Functor.map_comp Φ p (Quiver.Hom.toPath f'))
 
 /-- Two functors out of a path category are equal when they agree on singleton paths. -/
 @[ext (iff := false)]
@@ -280,10 +269,7 @@ def quotientPathsEquiv : Quotient (pathsHomRel C) ≌ C where
   counitIso := NatIso.ofComponents (fun _ => Iso.refl _) (fun f => by simp)
   functor_unitIso_comp X := by
     cases X
-    simp only [Functor.id_obj,
-               quotientPathsTo_obj, Functor.comp_obj, toQuotientPaths_obj_as,
-               NatIso.ofComponents_hom_app, Iso.refl_hom, quotientPathsTo_map, Category.comp_id]
-    rfl
+    cat_disch
 
 end
 

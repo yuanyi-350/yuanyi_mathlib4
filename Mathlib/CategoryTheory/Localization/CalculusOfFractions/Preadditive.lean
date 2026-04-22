@@ -110,12 +110,8 @@ lemma neg'_eq (f : L.obj X ⟶ L.obj Y) (φ : W.LeftFraction X Y)
     ⟨_, (exists_leftFraction L W f).choose_spec, rfl⟩
   rw [MorphismProperty.LeftFraction.map_eq_iff] at hφ
   obtain ⟨Y', t₁, t₂, hst, hft, ht⟩ := hφ
-  have := inverts L W _ ht
-  rw [← cancel_mono (L.map (φ₀.s ≫ t₁))]
-  nth_rw 1 [L.map_comp]
-  rw [hφ₀, hst, LeftFraction.map_comp_map_s_assoc, L.map_comp,
-    LeftFraction.map_comp_map_s_assoc, ← L.map_comp, ← L.map_comp,
-    neg_comp, neg_comp, hft]
+  rw [hφ₀, MorphismProperty.LeftFraction.map_eq_iff]
+  exact ⟨Y', t₁, t₂, hst, by rw [neg_comp, neg_comp, hft], ht⟩
 
 /-- The addition of two maps `L.obj X ⟶ L.obj Y` when `L : C ⥤ D` is a localization
 functor, `C` is preadditive and there is a left calculus of fractions. -/
@@ -133,13 +129,9 @@ lemma add'_eq (f₁ f₂ : L.obj X ⟶ L.obj Y) (φ : W.LeftFraction₂ X Y)
     ⟨(exists_leftFraction₂ L W f₁ f₂).choose,
       (exists_leftFraction₂ L W f₁ f₂).choose_spec.1,
       (exists_leftFraction₂ L W f₁ f₂).choose_spec.2, rfl⟩
+  rw [hφ₀, MorphismProperty.LeftFraction.map_eq_iff]
   obtain ⟨Z, t₁, t₂, hst, hft, hft', ht⟩ := (LeftFraction₂.map_eq_iff L W φ₀ φ).1 ⟨hφ₁, hφ₂⟩
-  have := inverts L W _ ht
-  rw [hφ₀, ← cancel_mono (L.map (φ₀.s ≫ t₁))]
-  nth_rw 2 [hst]
-  rw [L.map_comp, L.map_comp, LeftFraction.map_comp_map_s_assoc,
-    LeftFraction.map_comp_map_s_assoc, ← L.map_comp, ← L.map_comp,
-    add_comp, add_comp, hft, hft']
+  exact ⟨Z, t₁, t₂, hst, by rw [add_comp, add_comp, hft, hft'], ht⟩
 
 lemma add'_comm (f₁ f₂ : L.obj X ⟶ L.obj Y) :
     add' W f₁ f₂ = add' W f₂ f₁ := by

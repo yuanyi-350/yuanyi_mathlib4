@@ -254,14 +254,10 @@ theorem sup_exists :
     refine ⟨coeq (f ≫ T' mY) (T' mX), fun mZ => T' mZ ≫ coeqHom (f ≫ T' mY) (T' mX), ?_⟩
     intro X' Y' mX' mY' f' mf'
     rw [← Category.assoc]
-    by_cases h : X = X' ∧ Y = Y'
-    · rcases h with ⟨rfl, rfl⟩
+    obtain h | mf' := Finset.mem_insert.mp mf'
+    · cases h
       grind [coeq_condition]
-    · rw [@w' _ _ mX' mY' f' _]
-      apply Finset.mem_of_mem_insert_of_ne mf'
-      contrapose! h
-      obtain ⟨rfl, h⟩ := h
-      trivial
+    · rw [@w' _ _ mX' mY' f' mf']
 
 /-- An arbitrary choice of object "to the right"
 of a finite collection of objects `O` and morphisms `H`,
@@ -296,12 +292,7 @@ theorem cocone_nonempty (F : J ⥤ C) : Nonempty (Cocone F) := by
   obtain ⟨Z, f, w⟩ := sup_exists O H
   refine ⟨⟨Z, ⟨fun X => f (by simp [O]), ?_⟩⟩⟩
   intro j j' g
-  dsimp
-  simp only [Category.comp_id]
-  apply w
-  simp only [O, H, Finset.mem_biUnion, Finset.mem_univ, Finset.mem_image, PSigma.mk.injEq,
-    true_and, exists_and_left]
-  exact ⟨j, rfl, j', g, by simp⟩
+  aesop (add simp [H])
 
 /-- An arbitrary choice of cocone over `F : J ⥤ C`, for `FinCategory J` and `IsFiltered C`.
 -/
@@ -783,14 +774,10 @@ theorem inf_exists :
     refine ⟨eq (T' mX ≫ f) (T' mY), fun mZ => eqHom (T' mX ≫ f) (T' mY) ≫ T' mZ, ?_⟩
     intro X' Y' mX' mY' f' mf'
     rw [Category.assoc]
-    by_cases h : X = X' ∧ Y = Y'
-    · rcases h with ⟨rfl, rfl⟩
+    obtain h | mf' := Finset.mem_insert.mp mf'
+    · cases h
       grind [eq_condition]
-    · rw [@w' _ _ mX' mY' f' _]
-      apply Finset.mem_of_mem_insert_of_ne mf'
-      contrapose! h
-      obtain ⟨rfl, h⟩ := h
-      trivial
+    · rw [@w' _ _ mX' mY' f' mf']
 
 /-- An arbitrary choice of object "to the left"
 of a finite collection of objects `O` and morphisms `H`,
@@ -826,13 +813,8 @@ theorem cone_nonempty (F : J ⥤ C) : Nonempty (Cone F) := by
   obtain ⟨Z, f, w⟩ := inf_exists O H
   refine ⟨⟨Z, ⟨fun X => f (by simp [O]), ?_⟩⟩⟩
   intro j j' g
-  dsimp
-  simp only [Category.id_comp]
   symm
-  apply w
-  simp only [O, H, Finset.mem_biUnion, Finset.mem_univ, Finset.mem_image,
-    PSigma.mk.injEq, true_and, exists_and_left]
-  exact ⟨j, rfl, j', g, by simp⟩
+  aesop (add simp [H])
 
 /-- An arbitrary choice of cone over `F : J ⥤ C`, for `FinCategory J` and `IsCofiltered C`.
 -/

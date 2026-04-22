@@ -346,14 +346,10 @@ def conePointsIsoOfEquivalence {F : J ⥤ C} {s : Cone F} {G : K ⥤ C} {t : Con
     inv := P.lift ((Cone.equivalenceOfReindexing e w).functor.obj t)
     hom_inv_id := by
       apply hom_ext P; intro j
-      dsimp [w']
-      simp only [Limits.Cone.whisker_π, Limits.Cone.postcompose_obj_π, fac, whiskerLeft_app,
-        assoc, id_comp, invFunIdAssoc_hom_app, fac_assoc, NatTrans.comp_app]
-      rw [counit_app_functor, ← Functor.comp_map]
-      have l :
-        NatTrans.app w.hom j = NatTrans.app w.hom ((𝟭 J).obj j) := by dsimp
-      rw [l, w.hom.naturality]
-      simp
+      simpa [w'] using by
+        rw [counit_app_functor, ← Functor.comp_map,
+          show w.hom.app j = w.hom.app ((𝟭 J).obj j) by rfl, w.hom.naturality]
+        simp
     inv_hom_id := by
       apply hom_ext Q
       cat_disch }
@@ -456,11 +452,7 @@ def homOfCone (s : Cone F) : s.pt ⟶ X :=
 
 @[simp]
 theorem coneOfHom_homOfCone (s : Cone F) : coneOfHom h (homOfCone h s) = s := by
-  dsimp [coneOfHom, homOfCone]
-  match s with
-  | .mk s_pt s_π =>
-    congr
-    exact h.homEquiv.apply_symm_apply s_π
+  exact congrArg (Cone.mk s.pt) (h.homEquiv.apply_symm_apply s.π)
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -499,12 +491,8 @@ the representing object is a limit cone.
 def ofRepresentableBy {X : C} (h : F.cones.RepresentableBy X) : IsLimit (limitCone h) where
   lift s := homOfCone h s
   fac s j := by
-    have h := cone_fac h s
-    cases s
-    injection h with h₁ h₂
-    simp only at h₂
-    conv_rhs => rw [← h₂]
-    rfl
+    exact (congr_app (h.homEquiv_eq (homOfCone h s)) j).symm.trans
+      (congr_app (h.homEquiv.apply_symm_apply s.π) j)
   uniq s m w := by
     rw [← homOfCone_coneOfHom h m]
     congr
@@ -953,11 +941,7 @@ def homOfCocone (s : Cocone F) : X ⟶ s.pt :=
 
 @[simp]
 theorem coconeOfHom_homOfCocone (s : Cocone F) : coconeOfHom h (homOfCocone h s) = s := by
-  dsimp [coconeOfHom, homOfCocone]
-  match s with
-  | .mk s_pt s_ι =>
-    congr
-    exact h.homEquiv.apply_symm_apply s_ι
+  exact congrArg (Cocone.mk s.pt) (h.homEquiv.apply_symm_apply s.ι)
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -997,12 +981,8 @@ def ofCorepresentableBy {X : C} (h : F.cocones.CorepresentableBy X) :
     IsColimit (colimitCocone h) where
   desc s := homOfCocone h s
   fac s j := by
-    have h := cocone_fac h s
-    cases s
-    injection h with h₁ h₂
-    simp only at h₂
-    conv_rhs => rw [← h₂]
-    rfl
+    exact (congr_app (h.homEquiv_eq (homOfCocone h s)) j).symm.trans
+      (congr_app (h.homEquiv.apply_symm_apply s.ι) j)
   uniq s m w := by
     rw [← homOfCocone_coconeOfHom h m]
     congr

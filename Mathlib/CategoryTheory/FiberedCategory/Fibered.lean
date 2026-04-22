@@ -124,25 +124,14 @@ implies being fibered. -/
 lemma isStronglyCartesian_of_exists_isCartesian (p : 𝒳 ⥤ 𝒮) (h : ∀ (a : 𝒳) (R : 𝒮)
     (f : R ⟶ p.obj a), ∃ (b : 𝒳) (φ : b ⟶ a), IsStronglyCartesian p f φ) {R S : 𝒮} (f : R ⟶ S)
       {a b : 𝒳} (φ : a ⟶ b) [p.IsCartesian f φ] : p.IsStronglyCartesian f φ := by
-  constructor
-  intro c g φ' hφ'
   subst_hom_lift p f φ; clear a b R S
   -- Let `ψ` be a Cartesian arrow lying over `g`
   obtain ⟨a', ψ, hψ⟩ := h _ _ (p.map φ)
-  -- Let `τ' : c ⟶ a'` be the map induced by the universal property of `ψ`
-  let τ' := IsStronglyCartesian.map p (p.map φ) ψ (f' := g ≫ p.map φ) rfl φ'
   -- Let `Φ : a' ≅ a` be natural isomorphism induced between `φ` and `ψ`.
   let Φ := domainUniqueUpToIso p (p.map φ) φ ψ
-  -- The map induced by `φ` will be `τ' ≫ Φ.hom`
-  use τ' ≫ Φ.hom
-  -- It is easily verified that `τ' ≫ Φ.hom` lifts `g` and `τ' ≫ Φ.hom ≫ φ = φ'`
-  refine ⟨⟨by simp only [Φ]; infer_instance, ?_⟩, ?_⟩
-  · simp [τ', Φ]
-  -- It remains to check that it is unique. This follows from the universal property of `ψ`.
-  intro π ⟨hπ, hπ_comp⟩
-  rw [← Iso.comp_inv_eq]
-  apply IsStronglyCartesian.map_uniq p (p.map φ) ψ rfl φ'
-  simp [hπ_comp, Φ]
+  convert (inferInstance : p.IsStronglyCartesian (𝟙 (p.obj a) ≫ p.map φ) (Φ.inv ≫ ψ)) using 1
+  · simp
+  · simp [Φ]
 
 /-- Alternate constructor for `IsFibered`, a functor `p : 𝒳 ⥤ 𝒴` is fibered if any diagram of the
 form

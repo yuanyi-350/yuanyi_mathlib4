@@ -93,11 +93,7 @@ noncomputable def induced : F.ShiftSequence M where
     ext1
     apply ((whiskeringLeft C D A).obj L).map_injective
     ext K
-    dsimp
-    simp only [induced.shiftIso_hom_app_obj, shiftIso_zero_hom_app, id_obj,
-      NatTrans.naturality, comp_map, Iso.hom_inv_id_app_assoc,
-      comp_id, ← Functor.map_comp, L.commShiftIso_zero, CommShift.isoZero_inv_app, assoc,
-      Iso.inv_hom_id_app, Functor.map_id]
+    simp [induced.shiftIso_hom_app_obj, L.commShiftIso_zero, ← Functor.map_comp]
   shiftIso_add n m a a' a'' ha' ha'' := by
     ext1
     apply ((whiskeringLeft C D A).obj L).map_injective
@@ -134,12 +130,8 @@ lemma induced_shiftMap {n : M} {X Y : C} (f : X ⟶ Y⟦n⟧) (a a' : M) (h : n 
     letI := induced e M F' e'
     F.shiftMap (L.map f ≫ (L.commShiftIso n).hom.app _) a a' h =
       (e' a).hom.app X ≫ G.shiftMap f a a' h ≫ (e' a').inv.app Y := by
-  dsimp [shiftMap]
-  rw [Functor.map_comp, induced_shiftIso_hom_app_obj, assoc, assoc]
-  nth_rw 2 [← Functor.map_comp_assoc]
-  simp only [comp_obj, Iso.hom_inv_id_app, map_id, id_comp]
-  rw [← NatTrans.naturality_assoc]
-  rfl
+  simpa [shiftMap, induced_shiftIso_hom_app_obj, ← Functor.map_comp_assoc] using
+    (e' a).hom.naturality_assoc f <| (G.shiftIso n a a' h).hom.app Y ≫ (e' a').inv.app Y
 
 end ShiftSequence
 

@@ -142,24 +142,11 @@ def coconeOfCoconeUncurry {D : DiagramOfCocones F} (Q : ∀ j, IsColimit (D.obj 
             ι :=
               { app := fun k => c.ι.app (j, k)
                 naturality := fun k k' f => by
-                  dsimp; simp only [Category.comp_id]
-                  conv_lhs =>
-                    arg 1; equals (F.map (𝟙 _)).app _ ≫ (F.obj j).map f =>
-                      simp
-                  conv_lhs => arg 1; rw [← uncurry_obj_map F (𝟙 j ×ₘ f)]
-                  rw [c.w] } }
+                  simpa using @NatTrans.naturality _ _ _ _ _ _ c.ι (j, k) (j, k') (𝟙 j, f) } }
       naturality := fun j j' f =>
         (Q j).hom_ext
-          (by
-            dsimp
-            intro k
-            simp only [Limits.CoconeMorphism.w_assoc, Limits.Cocone.precompose_obj_ι,
-              Limits.IsColimit.fac, NatTrans.comp_app, Category.comp_id,
-              Category.assoc]
-            have := @NatTrans.naturality _ _ _ _ _ _ c.ι (j, k) (j', k) (f, 𝟙 k)
-            dsimp at this
-            simp only [Category.comp_id, CategoryTheory.Functor.map_id] at this
-            exact this) }
+          (fun k => by
+            simpa using @NatTrans.naturality _ _ _ _ _ _ c.ι (j, k) (j', k) (f, 𝟙 k)) }
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Given a diagram `D` of colimit cocones under the `curry.obj G j`, and a cocone under `G`,
@@ -186,22 +173,18 @@ def coneOfConeUncurryIsLimit {D : DiagramOfCones F} (Q : ∀ j, IsLimit (D.obj j
         π :=
           { app := fun p => s.π.app p.1 ≫ (D.obj p.1).π.app p.2
             naturality := fun p p' f => by
-              dsimp; simp only [Category.id_comp, Category.assoc]
               rcases p with ⟨j, k⟩
               rcases p' with ⟨j', k'⟩
               rcases f with ⟨fj, fk⟩
-              dsimp
+              dsimp; simp only [Category.id_comp, Category.assoc]
               slice_rhs 3 4 => rw [← NatTrans.naturality]
               slice_rhs 2 3 => rw [← (D.obj j).π.naturality]
               simp only [Functor.const_obj_map, Category.id_comp, Category.assoc]
               have w := (D.map fj).w k'
               dsimp at w
               rw [← w]
-              have n := s.π.naturality fj
-              dsimp at n
-              simp only [Category.id_comp] at n
-              rw [n]
-              simp } }
+              simpa [Category.assoc] using
+                congrArg (fun f => f ≫ (D.obj j').π.app k') (s.π.naturality fj) } }
   fac s j := by
     apply (Q j).hom_ext
     intro k
@@ -234,18 +217,8 @@ def IsLimit.ofConeOfConeUncurry {D : DiagramOfCones F} (Q : ∀ j, IsLimit (D.ob
     fac s p := by
       have h1 := (Q p.1).fac ((Cone.postcompose (E p.1).hom).obj <|
         s.whisker (Prod.sectR p.1 K)) p.2
-      simp only [Functor.comp_obj, Prod.sectR_obj, uncurry_obj_obj,
-        Cone.postcompose_obj_pt, Cone.whisker_pt, Cone.postcompose_obj_π,
-        Cone.whisker_π, NatTrans.comp_app, Functor.const_obj_obj, whiskerLeft_app,
-        NatIso.ofComponents_hom_app, Iso.refl_hom, Category.comp_id, E] at h1
-      have h2 := (P.fac (S s) p.1)
-      dsimp only [Functor.comp_obj, Prod.sectR_obj, uncurry_obj_obj, NatTrans.id_app,
-        Functor.const_obj_obj, DiagramOfCones.conePoints_obj, DiagramOfCones.conePoints_map,
-        Functor.const_obj_map, id_eq, Cone.postcompose_obj_pt, Cone.whisker_pt,
-        Cone.postcompose_obj_π, Cone.whisker_π, NatTrans.comp_app, whiskerLeft_app,
-        NatIso.ofComponents_hom_app, Iso.refl_hom, Prod.sectL_obj, Prod.sectL_map, eq_mp_eq_cast,
-        eq_mpr_eq_cast, coneOfConeUncurry_pt, coneOfConeUncurry_π_app, S, E] at h2 ⊢
-      simp [← h1, ← h2]
+      have h2 := congrArg (fun f => f ≫ (D.obj p.1).π.app p.2) (P.fac (S s) p.1)
+      simpa [S, E] using h2.trans h1
     uniq s f hf := P.uniq (s := S s) _ <|
       fun j ↦ (Q j).hom_ext <| fun k ↦ by simpa [S, E] using hf (j, k) }
 
@@ -260,7 +233,6 @@ def coconeOfCoconeUncurryIsColimit {D : DiagramOfCocones F} (Q : ∀ j, IsColimi
         ι :=
           { app := fun p => (D.obj p.1).ι.app p.2 ≫ s.ι.app p.1
             naturality := fun p p' f => by
-              dsimp; simp only [Category.assoc]
               rcases p with ⟨j, k⟩
               rcases p' with ⟨j', k'⟩
               rcases f with ⟨fj, fk⟩
@@ -270,11 +242,8 @@ def coconeOfCoconeUncurryIsColimit {D : DiagramOfCocones F} (Q : ∀ j, IsColimi
               have w := (D.map fj).w k
               dsimp at w
               slice_lhs 1 2 => rw [← w]
-              have n := s.ι.naturality fj
-              dsimp at n
-              simp only [Category.comp_id] at n
-              rw [← n]
-              simp } }
+              simpa [Category.assoc] using
+                congrArg (fun f => (D.obj j).ι.app k ≫ f) (s.ι.naturality fj) } }
   fac s j := by
     apply (Q j).hom_ext
     intro k

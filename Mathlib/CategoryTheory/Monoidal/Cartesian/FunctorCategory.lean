@@ -43,19 +43,11 @@ instance cartesianMonoidalCategory : CartesianMonoidalCategory (J ⥤ C) where
     evaluationJointlyReflectsLimits _
       fun _ ↦ isLimitChangeEmptyCone _ isTerminalTensorUnit _ (.refl _)
   fst_def X Y := by
-    ext
-    simp only [Monoidal.tensorObj_obj, fst_def, asEmptyCone_pt, NatTrans.comp_app,
-      Monoidal.tensorUnit_obj, Monoidal.whiskerLeft_app, Monoidal.rightUnitor_hom_app,
-      Iso.cancel_iso_hom_right]
-    congr
-    subsingleton
+    ext; simp only [Monoidal.tensorObj_obj, fst_def, asEmptyCone_pt, NatTrans.comp_app,
+      Monoidal.tensorUnit_obj, Monoidal.whiskerLeft_app, Monoidal.rightUnitor_hom_app]; cat_disch
   snd_def X Y := by
-    ext
-    simp only [Monoidal.tensorObj_obj, snd_def, asEmptyCone_pt, NatTrans.comp_app,
-      Monoidal.tensorUnit_obj, Monoidal.whiskerRight_app, Monoidal.leftUnitor_hom_app,
-      Iso.cancel_iso_hom_right]
-    congr
-    subsingleton
+    ext; simp only [Monoidal.tensorObj_obj, snd_def, asEmptyCone_pt, NatTrans.comp_app,
+      Monoidal.tensorUnit_obj, Monoidal.whiskerRight_app, Monoidal.leftUnitor_hom_app]; cat_disch
 
 @[deprecated (since := "2026-03-07")] alias chosenTerminal := MonoidalCategory.tensorUnit
 @[deprecated (since := "2026-03-07")] alias chosenTerminalIsTerminal :=
@@ -88,23 +80,17 @@ lemma snd_app (F₁ F₂ : J ⥤ C) (j : J) : (snd F₁ F₂).app j = snd (F₁.
 lemma leftUnitor_hom_app (F : J ⥤ C) (j : J) :
     (λ_ F).hom.app j = (λ_ (F.obj j)).hom := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma leftUnitor_inv_app (F : J ⥤ C) (j : J) :
-    (λ_ F).inv.app j = (λ_ (F.obj j)).inv := by
-  rw [← cancel_mono ((λ_ (F.obj j)).hom), Iso.inv_hom_id, ← leftUnitor_hom_app,
-    Iso.inv_hom_id_app]
+    (λ_ F).inv.app j = (λ_ (F.obj j)).inv := rfl
 
 @[simp]
 lemma rightUnitor_hom_app (F : J ⥤ C) (j : J) :
     (ρ_ F).hom.app j = (ρ_ (F.obj j)).hom := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma rightUnitor_inv_app (F : J ⥤ C) (j : J) :
-    (ρ_ F).inv.app j = (ρ_ (F.obj j)).inv := by
-  rw [← cancel_mono ((ρ_ (F.obj j)).hom), Iso.inv_hom_id, ← rightUnitor_hom_app,
-    Iso.inv_hom_id_app]
+    (ρ_ F).inv.app j = (ρ_ (F.obj j)).inv := rfl
 
 lemma tensorHom_app_fst {F₁ F₁' F₂ F₂' : J ⥤ C} (f : F₁ ⟶ F₁') (g : F₂ ⟶ F₂') (j : J) :
     (f ⊗ₘ g).app j ≫ fst _ _ = fst _ _ ≫ f.app j := by
@@ -135,11 +121,9 @@ lemma associator_hom_app (F₁ F₂ F₃ : J ⥤ C) (j : J) :
     (α_ F₁ F₂ F₃).hom.app j = (α_ _ _ _).hom := by
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma associator_inv_app (F₁ F₂ F₃ : J ⥤ C) (j : J) :
-    (α_ F₁ F₂ F₃).inv.app j = (α_ _ _ _).inv := by
-  rw [← cancel_mono ((α_ _ _ _).hom), Iso.inv_hom_id, ← associator_hom_app, Iso.inv_hom_id_app]
+    (α_ F₁ F₂ F₃).inv.app j = (α_ _ _ _).inv := rfl
 
 instance {K : Type*} [Category* K] [HasColimitsOfShape K C]
     [∀ X : C, PreservesColimitsOfShape K (tensorLeft X)] {F : J ⥤ C} :

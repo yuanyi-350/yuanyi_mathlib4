@@ -185,13 +185,8 @@ noncomputable def commShiftOfLocalization : F'.CommShift A where
     ext1
     apply natTrans_ext L W
     intro X
-    dsimp
-    simp only [commShiftOfLocalization.iso_hom_app, comp_obj, commShiftIso_zero,
-      CommShift.isoZero_inv_app, map_comp, CommShift.isoZero_hom_app, Category.assoc,
-      ← NatTrans.naturality_assoc, ← NatTrans.naturality]
-    dsimp
-    simp only [← Functor.map_comp_assoc, ← Functor.map_comp,
-      Iso.inv_hom_id_app, id_obj, map_id, Category.id_comp, Iso.hom_inv_id_app_assoc]
+    simp [commShiftOfLocalization.iso, commShiftIso_zero, ← NatTrans.naturality,
+      ← NatTrans.naturality_assoc, ← Functor.map_comp_assoc, ← Functor.map_comp]
   commShiftIso_add a b := by
     ext1
     apply natTrans_ext L W
@@ -247,12 +242,8 @@ instance NatTrans.commShift_iso_hom_of_localization :
   constructor
   intro a
   ext X
-  simp only [comp_app, Functor.whiskerRight_app, Functor.whiskerLeft_app,
-    Functor.commShiftIso_comp_hom_app,
-    Functor.commShiftOfLocalization_iso_hom_app,
-    Category.assoc, ← Functor.map_comp, ← Functor.map_comp_assoc,
-    Iso.hom_inv_id_app, Functor.map_id, Iso.inv_hom_id_app,
-    Category.comp_id, Category.id_comp, Functor.comp_obj]
+  simp [Functor.commShiftIso_comp_hom_app, Functor.commShiftOfLocalization_iso_hom_app,
+    ← Functor.map_comp, ← Functor.map_comp_assoc]
 
 end
 

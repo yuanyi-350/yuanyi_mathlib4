@@ -497,12 +497,7 @@ lemma kernel.zeroKernelFork_ι : (kernel.zeroKernelFork f).ι = 0 := rfl
 
 /-- The map from the zero object is a kernel of a monomorphism -/
 def kernel.isLimitConeZeroCone [Mono f] : IsLimit (kernel.zeroKernelFork f) :=
-  Fork.IsLimit.mk _ (fun _ => 0)
-    (fun s => by
-      rw [zero_comp]
-      refine (zero_of_comp_mono f ?_).symm
-      exact KernelFork.condition _)
-    fun _ _ _ => zero_of_to_zero _
+  KernelFork.IsLimit.ofMonoOfIsZero _ inferInstance (by simpa using isZero_zero C)
 
 /-- The kernel of a monomorphism is isomorphic to the zero object -/
 def kernel.ofMono [HasKernel f] [Mono f] : kernel f ≅ 0 :=
@@ -1063,14 +1058,8 @@ def cokernelImageι {X Y : C} (f : X ⟶ Y) [HasImage f] [HasCokernel (image.ι 
   hom :=
     cokernel.desc _ (cokernel.π f)
       (by
-        have w := cokernel.condition f
-        conv at w =>
-          lhs
-          congr
-          rw [← image.fac f]
-        rw [← HasZeroMorphisms.comp_zero (Limits.factorThruImage f), Category.assoc,
-          cancel_epi] at w
-        exact w)
+        exact zero_of_epi_comp (factorThruImage f)
+          (by simp [cokernel.condition]))
   inv :=
     cokernel.desc _ (cokernel.π _)
       (by

@@ -138,13 +138,7 @@ def WalkingCospan.ext {F : WalkingCospan ⥤ C} {s t : Cone F} (i : s.pt ≅ t.p
     (w₂ : s.π.app WalkingCospan.right = i.hom ≫ t.π.app WalkingCospan.right) : s ≅ t := by
   apply Cone.ext i _
   rintro (⟨⟩ | ⟨⟨⟩⟩)
-  · have h₁ := s.π.naturality WalkingCospan.Hom.inl
-    dsimp at h₁
-    simp only [Category.id_comp] at h₁
-    have h₂ := t.π.naturality WalkingCospan.Hom.inl
-    dsimp at h₂
-    simp only [Category.id_comp] at h₂
-    simp_rw [h₂, ← Category.assoc, ← w₁, ← h₁]
+  · rw [← s.w inl, ← t.w inl, ← Category.assoc, ← w₁]
   · exact w₁
   · exact w₂
 
@@ -157,13 +151,8 @@ def WalkingSpan.ext {F : WalkingSpan ⥤ C} {s t : Cocone F} (i : s.pt ≅ t.pt)
     (w₂ : s.ι.app WalkingCospan.right ≫ i.hom = t.ι.app WalkingCospan.right) : s ≅ t := by
   apply Cocone.ext i _
   rintro (⟨⟩ | ⟨⟨⟩⟩)
-  · have h₁ := s.ι.naturality WalkingSpan.Hom.fst
-    dsimp at h₁
-    simp only [Category.comp_id] at h₁
-    have h₂ := t.ι.naturality WalkingSpan.Hom.fst
-    dsimp at h₂
-    simp only [Category.comp_id] at h₂
-    simp_rw [← h₁, Category.assoc, w₁, h₂]
+  · rw [← s.w fst, ← t.w fst]
+    simpa only [Category.assoc] using congrArg (fun f => F.map fst ≫ f) w₁
   · exact w₁
   · exact w₂
 

@@ -290,11 +290,7 @@ lemma shift_counit_app [adj.CommShift A] (a : A) (Y : D) :
     (adj.counit.app Y)⟦a⟧' =
       (F.commShiftIso a).inv.app (G.obj Y) ≫ F.map ((G.commShiftIso a).inv.app Y) ≫
         adj.counit.app (Y⟦a⟧) := by
-  have eq := NatTrans.shift_app_comm adj.counit a Y
-  simp only [Functor.comp_obj, Functor.id_obj, Functor.commShiftIso_comp_hom_app, assoc,
-    Functor.commShiftIso_id_hom_app, comp_id] at eq
-  simp only [← eq, Functor.comp_obj, Functor.id_obj, ← F.map_comp_assoc, Iso.inv_hom_id_app,
-    F.map_id, id_comp, Iso.inv_hom_id_app_assoc]
+  simpa [Functor.commShiftIso_comp_inv_app] using (commShiftIso_inv_app_counit_app adj A a Y).symm
 
 end Adjunction
 
@@ -345,13 +341,7 @@ lemma iso_inv_app (Y : D) :
                     (F.obj (G.obj Y)))) ≫
                 G.map ((shiftFunctor D a).map (adj.counit.app Y)) := by
   obtain rfl : b = -a := by rw [← add_left_inj a, h, neg_add_cancel]
-  simp only [iso, iso', shiftEquiv', Equiv.toFun_as_coe, conjugateIsoEquiv_apply_inv,
-    conjugateEquiv_apply_app, Functor.comp_obj, comp_unit_app, Functor.id_obj,
-    Equivalence.toAdjunction_unit, Equivalence.Equivalence_mk'_unit, Iso.symm_hom, Functor.comp_map,
-    comp_counit_app, Equivalence.toAdjunction_counit, Equivalence.Equivalence_mk'_counit,
-    Functor.map_shiftFunctorCompIsoId_hom_app, assoc, Functor.map_comp]
-  slice_lhs 3 4 => rw [← Functor.map_comp, ← Functor.map_comp, Iso.inv_hom_id_app]
-  simp only [Functor.comp_obj, Functor.map_id, id_comp, assoc]
+  simp [iso, iso', shiftEquiv']
 
 set_option backward.isDefEq.respectTransparency false in
 /--

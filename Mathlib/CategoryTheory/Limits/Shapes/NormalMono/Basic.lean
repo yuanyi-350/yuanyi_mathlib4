@@ -6,7 +6,7 @@ Authors: Kim Morrison, Bhavik Mehta
 module
 
 public import Mathlib.CategoryTheory.Limits.Shapes.RegularMono
-public import Mathlib.CategoryTheory.Limits.Shapes.Kernels
+public import Mathlib.CategoryTheory.Limits.Shapes.Opposites.Kernels
 public import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
 /-!
@@ -267,18 +267,7 @@ def normalEpiOfNormalMonoUnop {X Y : Cᵒᵖ} (f : X ⟶ Y) (m : NormalMono f.un
   W := op m.Z
   g := m.g.op
   w := congrArg Quiver.Hom.op m.w
-  isColimit :=
-    CokernelCofork.IsColimit.ofπ _ _
-      (fun g' w' =>
-        (KernelFork.IsLimit.lift' m.isLimit g'.unop (congrArg Quiver.Hom.unop w')).1.op)
-      (fun g' w' =>
-        congrArg Quiver.Hom.op
-          (KernelFork.IsLimit.lift' m.isLimit g'.unop (congrArg Quiver.Hom.unop w')).2)
-      (by
-        rintro Z' g' w' m' rfl
-        apply Quiver.Hom.unop_inj
-        apply m.isLimit.uniq (KernelFork.ofι (m'.unop ≫ f.unop) _) m'.unop
-        rintro (⟨⟩ | ⟨⟩) <;> simp)
+  isColimit := KernelFork.IsLimit.ofιOp f.unop m.w m.isLimit
 
 /-- A normal epi becomes a normal mono in the opposite category. -/
 @[implicit_reducible]
@@ -286,18 +275,7 @@ def normalMonoOfNormalEpiUnop {X Y : Cᵒᵖ} (f : X ⟶ Y) (m : NormalEpi f.uno
   Z := op m.W
   g := m.g.op
   w := congrArg Quiver.Hom.op m.w
-  isLimit :=
-    KernelFork.IsLimit.ofι _ _
-      (fun g' w' =>
-        (CokernelCofork.IsColimit.desc' m.isColimit g'.unop (congrArg Quiver.Hom.unop w')).1.op)
-      (fun g' w' =>
-        congrArg Quiver.Hom.op
-          (CokernelCofork.IsColimit.desc' m.isColimit g'.unop (congrArg Quiver.Hom.unop w')).2)
-      (by
-        rintro Z' g' w' m' rfl
-        apply Quiver.Hom.unop_inj
-        apply m.isColimit.uniq (CokernelCofork.ofπ (f.unop ≫ m'.unop) _) m'.unop
-        rintro (⟨⟩ | ⟨⟩) <;> simp)
+  isLimit := CokernelCofork.IsColimit.ofπOp f.unop m.w m.isColimit
 
 section
 

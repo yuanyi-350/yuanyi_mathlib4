@@ -166,12 +166,7 @@ theorem tensorFunc_map_app {X Y : F C} (f : X ⟶ Y) (n) : ((tensorFunc C).map f
 
 theorem tensorFunc_obj_map (Z : F C) {n n' : N C} (f : n ⟶ n') :
     ((tensorFunc C).obj Z).map f = inclusion.map f ▷ Z := by
-  cases n
-  cases n'
-  rcases f with ⟨⟨h⟩⟩
-  dsimp at h
-  subst h
-  simp
+  cat_disch
 
 /-- Auxiliary definition for `normalizeIso`. Here we construct the isomorphism between
 `n ⊗ X` and `normalize X n`. -/
@@ -231,17 +226,7 @@ variable {C}
 
 theorem normalizeObj_congr (n : NormalMonoidalObject C) {X Y : F C} (f : X ⟶ Y) :
     normalizeObj X n = normalizeObj Y n := by
-  rcases f with ⟨f'⟩
-  apply @congr_fun _ _ fun n => normalizeObj X n
-  clear n f
-  induction f' with
-  | comp _ _ _ _ => apply Eq.trans <;> assumption
-  | whiskerLeft _ _ ih => funext; apply congr_fun ih
-  | whiskerRight _ _ ih => funext; apply congr_arg₂ _ rfl (congr_fun ih _)
-  | @tensor W X Y Z _ _ ih₁ ih₂ =>
-      funext n
-      simp [congr_fun ih₁ n, congr_fun ih₂ (normalizeObj Y n)]
-  | _ => funext; rfl
+  exact Discrete.eq_of_hom (((normalize C).map f).app ⟨n⟩)
 
 theorem normalize_naturality (n : NormalMonoidalObject C) {X Y : F C} (f : X ⟶ Y) :
     inclusionObj n ◁ f ≫ (normalizeIsoApp' C Y n).hom =

@@ -103,17 +103,11 @@ theorem iso_iff {P Q : C} (i : P ≅ Q) : Injective P ↔ Injective Q :=
 /-- The axiom of choice says that every nonempty type is an injective object in `Type`. -/
 instance (X : Type u₁) [Nonempty X] : Injective X where
   factors g f mono :=
-    ⟨fun z => by
-      classical
-      exact
-          if h : z ∈ Set.range f then g (Classical.choose h) else Nonempty.some inferInstance, by
+    by
+      rw [mono_iff_injective] at mono
+      refine ⟨Function.extend f g (fun _ => Nonempty.some inferInstance), ?_⟩
       ext y
-      classical
-      change dite (f y ∈ Set.range f) (fun h => g (Classical.choose h)) _ = _
-      split_ifs <;> rename_i h
-      · rw [mono_iff_injective] at mono
-        rw [mono (Classical.choose_spec h)]
-      · exact False.elim (h ⟨y, rfl⟩)⟩
+      simpa using mono.extend_apply g (fun _ => Nonempty.some inferInstance) y
 
 instance Type.enoughInjectives : EnoughInjectives (Type u₁) where
   presentation X :=
@@ -141,19 +135,10 @@ instance {β : Type v} (c : β → C) [HasProduct c] [∀ b, Injective (c b)] : 
     simp only [Category.assoc, limit.lift_π, Fan.mk_π_app, comp_factorThru]
 
 instance {P Q : C} [HasZeroMorphisms C] [HasBinaryBiproduct P Q] [Injective P] [Injective Q] :
-    Injective (P ⊞ Q) where
-  factors g f mono := by
-    refine ⟨biprod.lift (factorThru (g ≫ biprod.fst) f) (factorThru (g ≫ biprod.snd) f), ?_⟩
-    ext
-    · simp only [Category.assoc, biprod.lift_fst, comp_factorThru]
-    · simp only [Category.assoc, biprod.lift_snd, comp_factorThru]
+    Injective (P ⊞ Q) := Injective.of_iso (biprod.isoProd P Q).symm inferInstance
 
 instance {β : Type v} (c : β → C) [HasZeroMorphisms C] [HasBiproduct c] [∀ b, Injective (c b)] :
-    Injective (⨁ c) where
-  factors g f mono := by
-    refine ⟨biproduct.lift fun b => factorThru (g ≫ biproduct.π _ _) f, ?_⟩
-    ext
-    simp only [Category.assoc, biproduct.lift_π, comp_factorThru]
+    Injective (⨁ c) := Injective.of_iso (biproduct.isoProduct c).symm inferInstance
 
 instance {P : Cᵒᵖ} [Projective P] : Injective no_index (unop P) where
   factors g f mono :=
@@ -277,12 +262,8 @@ variable {D : Type*} [Category* D] {F : C ⥤ D} {G : D ⥤ C}
 set_option backward.isDefEq.respectTransparency false in
 theorem map_injective (adj : F ⊣ G) [F.PreservesMonomorphisms] (I : D) (hI : Injective I) :
     Injective (G.obj I) :=
-  ⟨fun {X} {Y} f g => by
-    intro
-    rcases hI.factors (F.map f ≫ adj.counit.app _) (F.map g) with ⟨w,h⟩
-    use adj.unit.app Y ≫ G.map w
-    rw [← unit_naturality_assoc, ← G.map_comp, h]
-    simp⟩
+  letI := hI
+  Injective.injective_of_adjoint adj I
 
 set_option backward.isDefEq.respectTransparency false in
 theorem injective_of_map_injective (adj : F ⊣ G) [G.Full] [G.Faithful] (I : D)

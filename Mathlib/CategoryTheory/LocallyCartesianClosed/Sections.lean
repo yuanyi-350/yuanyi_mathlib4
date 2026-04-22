@@ -97,12 +97,8 @@ def sectionsUncurry {X : Over I} {A : C} (v : A ⟶ (sections I).obj X) :
     have comm : toUnit A ≫ (curryRightUnitorHom I) = v₂ ≫ (ihom I).map X.hom := by
       rw [IsTerminal.hom_ext isTerminalTensorUnit (toUnit A) (v ≫ snd ..)]
       simp [v₂, condition]
-    dsimp [curryRightUnitorHom] at comm
-    have w' := (ihom.adjunction I).homEquiv_naturality_right_square _ _ _ _ comm
-    simp only [curriedTensor_obj_obj, curriedTensor_obj_map, curry,
-      Equiv.symm_apply_apply] at w'
-    dsimp [uncurry] at *
-    rw [Category.assoc, ← w', whiskerLeft_toUnit_comp_rightUnitor_hom, braiding_hom_fst])
+    rw [Category.assoc, ← uncurry_natural_right, ← comm, uncurry_natural_left, uncurry_curry,
+      whiskerLeft_toUnit_comp_rightUnitor_hom I A, braiding_hom_fst A I, toOver_obj_hom])
 
 @[simp]
 theorem sectionsCurry_sectionUncurry {X : Over I} {A : C} {v : A ⟶ (sections I).obj X} :
@@ -132,18 +128,9 @@ def coreHomEquivToOverSections : CoreHomEquiv (toOver I) (sections I) where
       left_inv {u} := sectionsUncurry_sectionsCurry
       right_inv {v} := sectionsCurry_sectionUncurry }
   homEquiv_naturality_left_symm := by
-    intro A' A X g v
-    dsimp [sectionsCurry, sectionsUncurry, curryRightUnitorHom]
-    simp only [toOver_map]
-    rw [← Over.homMk_comp]
-    congr 1
-    simp [uncurry_natural_left]
-  homEquiv_naturality_right := by
-    intro A X' X u g
-    dsimp [sectionsCurry, sectionsUncurry, curryRightUnitorHom]
-    apply ChosenPullbacksAlong.hom_ext
-    · simp [← curry_natural_right]
-    · simp
+    rintro A' A X g v; ext; simp [sectionsUncurry, uncurry_natural_left]
+  homEquiv_naturality_right := by rintro A X' X u g; apply ChosenPullbacksAlong.hom_ext <;>
+    simp [sectionsCurry, ← curry_natural_right]
 
 /-- The adjunction between the toOver functor and the sections functor. -/
 @[simps! unit_app counit_app]

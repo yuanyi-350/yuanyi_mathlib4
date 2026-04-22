@@ -142,19 +142,11 @@ namespace naturalityProperty
 
 instance isStableUnderComposition {F₁ F₂ : C ⥤ D} (app : ∀ X, F₁.obj X ⟶ F₂.obj X) :
     (naturalityProperty app).IsStableUnderComposition where
-  comp_mem f g hf hg := by
-    simp only [naturalityProperty] at hf hg ⊢
-    simp only [Functor.map_comp, Category.assoc, hg]
-    slice_lhs 1 2 => rw [hf]
-    rw [Category.assoc]
+  comp_mem f g hf hg := by grind [naturalityProperty]
 
 theorem stableUnderInverse {F₁ F₂ : C ⥤ D} (app : ∀ X, F₁.obj X ⟶ F₂.obj X) :
     (naturalityProperty app).StableUnderInverse := fun X Y e he => by
-  simp only [naturalityProperty] at he ⊢
-  rw [← cancel_epi (F₁.map e.hom)]
-  slice_rhs 1 2 => rw [he]
-  simp only [Category.assoc, ← F₁.map_comp_assoc, ← F₂.map_comp, e.hom_inv_id, Functor.map_id,
-    Category.id_comp, Category.comp_id]
+  exact (cancel_epi (F₁.map e.hom)).1 (by grind [naturalityProperty])
 
 end naturalityProperty
 
@@ -301,13 +293,9 @@ lemma multiplicativeClosure_eq_multiplicativeClosure' :
 
 lemma strictMap_multiplicativeClosure_le (F : C ⥤ D) :
     W.multiplicativeClosure.strictMap F ≤ (W.strictMap F).multiplicativeClosure := by
-  intro _ _ f hf
-  induction hf with | map hf
-  induction hf with
-  | of f hf => exact le_multiplicativeClosure _ _ ⟨hf⟩
-  | id x => simpa using .id (F.obj x)
-  | comp_of _ _ hf hg h =>
-    simpa using multiplicativeClosure.comp_of _ _ h (strictMap.map hg)
+  rintro _ _ _ ⟨hf⟩
+  exact ((multiplicativeClosure_le_iff W ((W.strictMap F).multiplicativeClosure.inverseImage F)).mpr
+    (fun _ _ f hf => le_multiplicativeClosure _ _ (.map hf)) _ hf)
 
 /-- A class of morphisms `W` has the of-postcomp property w.r.t. `W'` if whenever
 `g` is in `W'` and `f ≫ g` is in `W`, also `f` is in `W`. -/

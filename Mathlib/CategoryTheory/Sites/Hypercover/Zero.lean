@@ -111,11 +111,7 @@ def pullback₂ (f : S ⟶ T) (E : PreZeroHypercover.{w} T) [∀ i, HasPullback 
 
 lemma presieve₀_pullback₁ (f : S ⟶ T) (E : PreZeroHypercover.{w} T) [∀ i, HasPullback (E.f i) f] :
     presieve₀ (E.pullback₂ f) = E.presieve₀.pullbackArrows f := by
-  refine le_antisymm ?_ ?_
-  · rintro - - ⟨i⟩
-    use _, _, i
-  · rintro W g ⟨-, -, ⟨i⟩⟩
-    use i
+  simpa [presieve₀, pullback₂] using (Presieve.ofArrows_pullback (f := f) E.X E.f)
 
 /-- If `{Uᵢ}` covers `X`, this is the pre-`0`-hypercover of `X ×[Z] Y` given by `{Uᵢ ×[Z] Y}`. -/
 @[simps]
@@ -401,16 +397,8 @@ noncomputable def pullbackIso {S T : C} (f : S ⟶ T) (E : PreZeroHypercover.{w}
   hom.h₀ i := (pullbackSymmetry _ _).hom
   inv.s₀ := id
   inv.h₀ i := (pullbackSymmetry _ _).inv
-  hom_inv_id := by
-    apply Hom.ext (by rfl)
-    simp only [heq_eq_eq]
-    ext i
-    simp
-  inv_hom_id := by
-    apply Hom.ext (by rfl)
-    simp only [heq_eq_eq]
-    ext i
-    simp
+  hom_inv_id := Hom.ext' (by rfl) (by simp)
+  inv_hom_id := Hom.ext' (by rfl) (by simp)
 
 section
 
@@ -796,16 +784,9 @@ lemma Small.mem₀ (E : ZeroHypercover.{w} J S) [ZeroHypercover.Small.{w'} E] :
 
 instance (E : ZeroHypercover.{w} J S) : ZeroHypercover.Small.{max u v} E where
   exists_restrictIndex_mem := by
-    obtain ⟨ι, Y, f, h⟩ := E.presieve₀.exists_eq_ofArrows
-    have (Z : C) (g : Z ⟶ S) (hg : Presieve.ofArrows Y f g) :
-        ∃ (j : E.I₀) (h : Z = E.X j), g = eqToHom h ≫ E.f j := by
-      obtain ⟨j⟩ : E.presieve₀ g := by rwa [h]
-      use j, rfl
-      simp
-    choose j h₁ h₂ using this
-    refine ⟨ι, fun i ↦ j _ _ (.mk i), ?_⟩
+    use E.toPreZeroHypercover.shrink.I₀, E.toPreZeroHypercover.fromShrink.s₀
     convert E.mem₀
-    exact le_antisymm (fun Z g ⟨i⟩ ↦ ⟨_⟩) (h ▸ fun Z g ⟨i⟩ ↦ .mk' i (h₁ _ _ _) (h₂ _ _ _))
+    exact (Presieve.ofArrows_eq_ofArrows_uncurry E.f).symm
 
 /-- Restrict a `w'`-small `0`-hypercover to a `w'`-`0`-hypercover. -/
 @[simps toPreZeroHypercover]

@@ -133,7 +133,6 @@ def liftToPlusObjLimitObj {K : Type s} [SmallCategory K] [FinCategory K]
     (S : Cone (F ⋙ J.plusFunctor D ⋙ (evaluation Cᵒᵖ D).obj (op X))) :
     S.pt ⟶ (J.plusObj (limit F)).obj (op X) :=
   let x := (J.Cover X)ᵒᵖ
-  let F' := F ⋙ J.diagramFunctor D X
   let e := colimitLimitIso (F ⋙ J.diagramFunctor D X)
   let t : J.diagram (limit F) X ≅ limit (F ⋙ J.diagramFunctor D X) :=
     (isLimitOfPreserves (J.diagramFunctor D X) (limit.isLimit F)).conePointUniqueUpToIso
@@ -145,14 +144,7 @@ def liftToPlusObjLimitObj {K : Type s} [SmallCategory K] [FinCategory K]
     NatIso.ofComponents (fun k => colimitObjIsoColimitCompEvaluation _ k)
       (by
         intro i j f
-        rw [← Iso.eq_comp_inv, Category.assoc, ← Iso.inv_comp_eq]
-        refine colimit.hom_ext (fun w => ?_)
-        dsimp [plusMap]
-        erw [colimit.ι_map_assoc,
-          colimitObjIsoColimitCompEvaluation_ι_inv (F ⋙ J.diagramFunctor D X).flip w j,
-          colimitObjIsoColimitCompEvaluation_ι_inv_assoc (F ⋙ J.diagramFunctor D X).flip w i]
-        rw [← (colimit.ι (F ⋙ J.diagramFunctor D X).flip w).naturality]
-        rfl)
+        exact colimit_map_colimitObjIsoColimitCompEvaluation_hom _ f)
   limit.lift _ S ≫ (HasLimit.isoOfNatIso s.symm).hom ≫ e.inv ≫ p.inv
 
 set_option backward.isDefEq.respectTransparency false in
@@ -171,17 +163,8 @@ theorem liftToPlusObjLimitObj_fac {K : Type s} [SmallCategory K] [FinCategory K]
   dsimp
   rw [Category.assoc, Category.assoc, ← Iso.eq_inv_comp, Iso.inv_comp_eq, Iso.inv_comp_eq]
   refine colimit.hom_ext (fun j => ?_)
-  dsimp [plusMap]
-  simp only [HasColimit.isoOfNatIso_ι_hom_assoc, ι_colimMap]
-  dsimp [IsLimit.conePointUniqueUpToIso, HasLimit.isoOfNatIso, IsLimit.map]
-  rw [limit.lift_π]
-  dsimp
-  rw [ι_colimitLimitIso_limit_π_assoc]
-  simp_rw [← Category.assoc, ← NatTrans.comp_app]
-  rw [limit.lift_π, Category.assoc]
-  congr 1
-  rw [← Iso.comp_inv_eq]
-  erw [colimit.ι_desc]
+  simp [plusMap, IsLimit.conePointUniqueUpToIso, HasLimit.isoOfNatIso, IsLimit.map,
+    ι_colimitLimitIso_limit_π_assoc, colimitObjIsoColimitCompEvaluation_ι_app_hom]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in
@@ -201,15 +184,8 @@ instance preservesLimitsOfShape_plusFunctor
     simp only [limit.lift_π, Category.assoc, ← hm]
     congr 1
     refine colimit.hom_ext (fun k => ?_)
-    dsimp [plusMap, plusObj]
-    erw [colimit.ι_map, colimit.ι_desc_assoc, limit.lift_π]
-    conv_lhs => dsimp
-    simp only [Category.assoc]
-    rw [ι_colimitLimitIso_limit_π_assoc]
-    simp only [colimitObjIsoColimitCompEvaluation_ι_app_hom]
-    conv_lhs =>
-      dsimp [IsLimit.conePointUniqueUpToIso]
-    rw [← Category.assoc, ← NatTrans.comp_app, limit.lift_π]
+    simp [plusMap, plusObj, IsLimit.conePointUniqueUpToIso,
+      ι_colimitLimitIso_limit_π_assoc, colimitObjIsoColimitCompEvaluation_ι_app_hom]
     rfl
 
 instance preserveFiniteLimits_plusFunctor

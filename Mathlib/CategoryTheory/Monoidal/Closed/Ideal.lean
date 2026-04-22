@@ -208,13 +208,8 @@ def cartesianClosedOfReflective' (l : i.EssImageSubcategory ⥤ D) (φ : l ⋙ i
       adj := by
         apply (ihom.adjunction (i.obj B)).restrictFullyFaithful i.fullyFaithfulOfReflective
           i.fullyFaithfulOfReflective
-        · symm
-          refine NatIso.ofComponents (fun X => ?_) (fun f => ?_)
-          · haveI :=
-              Adjunction.rightAdjoint_preservesLimits.{0, 0} (reflectorAdjunction i)
-            apply asIso (prodComparison i B X)
-          · dsimp [asIso]
-            rw [prodComparison_natural_whiskerLeft]
+        · haveI := Adjunction.rightAdjoint_preservesLimits.{0, 0} (reflectorAdjunction i)
+          exact (prodComparisonNatIso i B).symm
         · exact (i.essImage.liftCompιIso _ _).symm.trans <|
             (Functor.isoWhiskerLeft _ φ.symm).trans (Functor.associator _ _ _).symm }
 
@@ -280,13 +275,7 @@ theorem bijection_symm_apply_id (A B : C) :
     ← MonoidalCategory.whisker_exchange_assoc, ← tensorHom_def'_assoc,
     Adjunction.homEquiv_symm_apply, ← Adjunction.eq_unit_comp_map_iff, Iso.comp_inv_eq,
     Category.assoc, prodComparisonIso_hom i ((reflector i).obj A) ((reflector i).obj B)]
-  apply hom_ext
-  · rw [tensorHom_fst, Category.assoc, Category.assoc, prodComparison_fst, ← i.map_comp,
-    prodComparison_fst]
-    apply (reflectorAdjunction i).unit.naturality
-  · rw [tensorHom_snd, Category.assoc, Category.assoc, prodComparison_snd, ← i.map_comp,
-    prodComparison_snd]
-    apply (reflectorAdjunction i).unit.naturality
+  apply hom_ext <;> simp [← i.map_comp]
 
 set_option backward.isDefEq.respectTransparency false in
 theorem bijection_natural (A B : C) (X X' : D) (f : (reflector i).obj (A ⊗ B) ⟶ X) (g : X ⟶ X') :

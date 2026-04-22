@@ -221,12 +221,8 @@ is the `< n`-truncation functor. See also the natural transformation `truncLTι`
 noncomputable def truncLT (n : ℤ) : C ⥤ C :=
   TruncAux.triangleFunctor t n ⋙ Triangle.π₁
 
-set_option backward.isDefEq.respectTransparency false in
 instance (n : ℤ) : (t.truncLT n).Additive where
-  map_add {_ _ _ _} := by
-    dsimp only [truncLT, Functor.comp_map]
-    rw [Functor.map_add]
-    dsimp
+  map_add {_ _ _ _} := by dsimp only [truncLT, Functor.comp_map]; rw [Functor.map_add]; rfl
 
 /-- The natural transformation `t.truncLT n ⟶ 𝟭 C` when `t` is a t-structure
 on a category `C` and `n : ℤ`. -/
@@ -238,12 +234,8 @@ is the `≥ n`-truncation functor. See also the natural transformation `truncGE�
 noncomputable def truncGE (n : ℤ) : C ⥤ C :=
   TruncAux.triangleFunctor t n ⋙ Triangle.π₃
 
-set_option backward.isDefEq.respectTransparency false in
 instance (n : ℤ) : (t.truncGE n).Additive where
-  map_add {_ _ _ _} := by
-    dsimp only [truncGE, Functor.comp_map]
-    rw [Functor.map_add]
-    dsimp
+  map_add {_ _ _ _} := by dsimp only [truncGE, Functor.comp_map]; rw [Functor.map_add]; rfl
 
 /-- The natural transformation `𝟭 C ⟶ t.truncGE n` when `t` is a t-structure
 on a category `C` and `n : ℤ`. -/

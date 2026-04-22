@@ -308,21 +308,12 @@ noncomputable def functorEnrichedHom : J ⥤ V where
   map f := precompEnrichedHom' V (Under.map f) (Iso.refl _) (Iso.refl _)
   map_id X := by
     ext j
-    -- this was produced by `simp?`
-    simp only [diagram_obj_obj, Functor.comp_obj, Under.forget_obj, end_.lift_π,
-      Under.map_obj_right, Iso.refl_inv, NatTrans.id_app, eHomWhiskerRight_id, Iso.refl_hom,
-      eHomWhiskerLeft_id, comp_id, id_comp]
-    congr 1
-    simp [Under.map, Comma.mapLeft]
-    rfl
+    simp [precompEnrichedHom']
+    congr 1; simp [Under.map, Comma.mapLeft]; rfl
   map_comp f g := by
     ext j
-    -- this was produced by `simp?`
-    simp only [diagram_obj_obj, Functor.comp_obj, Under.forget_obj, end_.lift_π,
-      Under.map_obj_right, Iso.refl_inv, NatTrans.id_app, eHomWhiskerRight_id, Iso.refl_hom,
-      eHomWhiskerLeft_id, comp_id, assoc]
-    congr 1
-    simp [Under.map, Comma.mapLeft]
+    simp [precompEnrichedHom', Under.map, Comma.mapLeft]
+    congr 1; simp
 
 variable [HasEnrichedHom V F₁ F₂]
 

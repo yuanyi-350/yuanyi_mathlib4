@@ -7,6 +7,8 @@ module
 
 public import Mathlib.CategoryTheory.Limits.Cones
 public import Mathlib.CategoryTheory.FinCategory.Basic
+public import Mathlib.Data.Fintype.Sigma
+public import Mathlib.Data.Fintype.Sum
 public import Mathlib.Data.Finset.Lattice.Lemmas
 
 /-!
@@ -110,50 +112,18 @@ def biconeMk {C : Type u₁} [Category.{v₁} C] {F : J ⥤ C} (c₁ c₂ : Cone
     · exact F.map f
   map_id X := by cases X <;> simp
   map_comp f g := by
-    rcases f with (_ | _ | _ | _ | _)
-    · exact (Category.id_comp _).symm
-    · exact (Category.id_comp _).symm
-    · cases g
-      exact (Category.id_comp _).symm.trans (c₁.π.naturality _)
-    · cases g
-      exact (Category.id_comp _).symm.trans (c₂.π.naturality _)
-    · cases g
-      apply F.map_comp
+    rcases f with (_ | _ | _ | _ | _) <;> cases g <;> simp
 
-open scoped Classical in
 instance finBiconeHom [FinCategory J] (j k : Bicone J) : Fintype (j ⟶ k) := by
-  cases j <;> cases k
-  · exact
-      { elems := {BiconeHom.left_id}
-        complete := fun f => by cases f; simp }
-  · exact
-    { elems := ∅
-      complete := fun f => by cases f }
-  · exact
-    { elems := {BiconeHom.left _}
-      complete := fun f => by cases f; simp }
-  · exact
-    { elems := ∅
-      complete := fun f => by cases f }
-  · exact
-      { elems := {BiconeHom.right_id}
-        complete := fun f => by cases f; simp }
-  · exact
-    { elems := {BiconeHom.right _}
-      complete := fun f => by cases f; simp }
-  · exact
-    { elems := ∅
-      complete := fun f => by cases f }
-  · exact
-    { elems := ∅
-      complete := fun f => by cases f }
-  · exact
-    { elems := Finset.image BiconeHom.diagram Fintype.elems
-      complete := fun f => by
-        rcases f with (_ | _ | _ | _ | f)
-        simp only [Finset.mem_image]
-        use f
-        simpa using Fintype.complete _ }
+  let code : (j ⟶ k) → Unit ⊕ Unit ⊕ J ⊕ J ⊕ (Σ j : J, Σ k : J, j ⟶ k) := fun f =>
+    match f with
+    | BiconeHom.left_id => Sum.inl ()
+    | BiconeHom.right_id => Sum.inr (Sum.inl ())
+    | BiconeHom.left j => Sum.inr (Sum.inr (Sum.inl j))
+    | BiconeHom.right j => Sum.inr (Sum.inr (Sum.inr (Sum.inl j)))
+    | BiconeHom.diagram f => Sum.inr (Sum.inr (Sum.inr (Sum.inr ⟨_, ⟨_, f⟩⟩)))
+  exact Fintype.ofInjective code
+    (by intro f g h; cases f <;> cases g <;> simp [code] at h ⊢; aesop)
 
 instance biconeSmallCategory : SmallCategory (Bicone J) :=
   CategoryTheory.biconeCategory J

@@ -312,17 +312,8 @@ def transport {F : C ⥤ C} (T : Monad C) (i : (T : C ⥤ C) ≅ F) : Monad C wh
   toFunctor := F
   η := T.η ≫ i.hom
   μ := (i.inv ◫ i.inv) ≫ T.μ ≫ i.hom
-  left_unit X := by
-    simp only [Functor.id_obj, NatTrans.comp_app, comp_obj, NatTrans.hcomp_app, Category.assoc,
-      hom_inv_id_app_assoc]
-    slice_lhs 1 2 => rw [← T.η.naturality (i.inv.app X), ]
-    simp
-  right_unit X := by
-    simp only [NatTrans.comp_app, Functor.map_comp, comp_obj, NatTrans.hcomp_app,
-      Category.assoc, NatTrans.naturality_assoc]
-    slice_lhs 2 4 =>
-      simp only [← T.map_comp]
-    simp
+  left_unit X := by simp [← T.unit_naturality_assoc]
+  right_unit X := by simp [← Functor.map_comp_assoc]
   assoc X := by
     simp only [comp_obj, NatTrans.comp_app, NatTrans.hcomp_app, Category.assoc, Functor.map_comp,
       NatTrans.naturality_assoc, hom_inv_id_app_assoc, NatIso.cancel_natIso_inv_left]

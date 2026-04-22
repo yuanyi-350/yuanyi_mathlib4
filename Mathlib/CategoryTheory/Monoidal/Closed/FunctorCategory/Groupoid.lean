@@ -43,12 +43,7 @@ def closedUnit (F : D ⥤ C) : 𝟭 (D ⥤ C) ⟶ tensorLeft F ⋙ closedIhom F 
   app G :=
   { app := fun X => (ihom.coev (F.obj X)).app (G.obj X)
     naturality := by
-      intro X Y f
-      dsimp
-      simp only [ihom.coev_naturality, closedIhom_obj_map, Monoidal.tensorObj_map]
-      dsimp
-      rw [coev_app_comp_pre_app_assoc, ← Functor.map_comp, tensorHom_def]
-      simp }
+      simp [tensorHom_def] }
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Auxiliary definition for `CategoryTheory.Functor.closed`.
@@ -58,11 +53,7 @@ def closedCounit (F : D ⥤ C) : closedIhom F ⋙ tensorLeft F ⟶ 𝟭 (D ⥤ C
   app G :=
   { app := fun X => (ihom.ev (F.obj X)).app (G.obj X)
     naturality := by
-      intro X Y f
-      dsimp
-      simp only [closedIhom_obj_map, pre_comm_ihom_map]
-      rw [tensorHom_def]
-      simp }
+      simp [tensorHom_def] }
 
 set_option backward.isDefEq.respectTransparency false in
 /-- If `C` is a monoidal closed category and `D` is a groupoid, then every functor `F : D ⥤ C` is

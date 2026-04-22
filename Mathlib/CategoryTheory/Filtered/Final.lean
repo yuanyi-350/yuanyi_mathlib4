@@ -336,21 +336,13 @@ instance Functor.initial_diag_of_isFiltered [IsCofilteredOrEmpty C] : Initial (F
 
 /-- If `C` is filtered, then every functor `F : C ⥤ Discrete PUnit` is final. -/
 theorem Functor.final_of_isFiltered_of_pUnit [IsFiltered C] (F : C ⥤ Discrete PUnit) :
-    Final F := by
-  refine final_of_exists_of_isFiltered F (fun _ => ?_) (fun {_} {c} _ _ => ?_)
-  · use Classical.choice IsFiltered.nonempty
-    exact ⟨Discrete.eqToHom (by simp)⟩
-  · use c; use 𝟙 c
-    apply Subsingleton.elim
+    Final F :=
+  (isConnected_iff_final_of_unique F).mp (IsFiltered.isConnected C)
 
 /-- If `C` is cofiltered, then every functor `F : C ⥤ Discrete PUnit` is initial. -/
 theorem Functor.initial_of_isCofiltered_pUnit [IsCofiltered C] (F : C ⥤ Discrete PUnit) :
-    Initial F := by
-  refine initial_of_exists_of_isCofiltered F (fun _ => ?_) (fun {_} {c} _ _ => ?_)
-  · use Classical.choice IsCofiltered.nonempty
-    exact ⟨Discrete.eqToHom (by simp)⟩
-  · use c; use 𝟙 c
-    apply Subsingleton.elim
+    Initial F :=
+  (isConnected_iff_initial_of_unique F).mp (IsCofiltered.isConnected C)
 
 /-- The functor `StructuredArrow.proj : StructuredArrow Y T ⥤ C` is final if `T : C ⥤ D` is final
 and `C` is filtered. -/

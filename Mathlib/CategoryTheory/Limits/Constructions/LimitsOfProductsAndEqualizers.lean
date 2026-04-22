@@ -346,20 +346,10 @@ provided the cocones used in its construction are.
 def buildIsColimit (t₁ : IsColimit c₁) (t₂ : IsColimit c₂) (hi : IsColimit i) :
     IsColimit (buildColimit s t hs ht i) where
   desc q := by
-    refine hi.desc (Cofork.ofπ ?_ ?_)
-    · refine t₂.desc (Cofan.mk _ fun j => ?_)
-      apply q.ι.app j
-    · apply t₁.hom_ext
-      intro ⟨j⟩
-      have reassoced_s (f : (p : J × J) × (p.fst ⟶ p.snd)) {W : C} (h : _ ⟶ W) :
-        c₁.ι.app ⟨f⟩ ≫ s ≫ h = F.map f.snd ≫ c₂.ι.app ⟨f.fst.snd⟩ ≫ h := by
-          simp only [← Category.assoc]
-          apply eq_whisker (hs f)
-      have reassoced_t (f : (p : J × J) × (p.fst ⟶ p.snd)) {W : C} (h : _ ⟶ W) :
-        c₁.ι.app ⟨f⟩ ≫ t ≫ h = c₂.ι.app ⟨f.fst.fst⟩ ≫ h := by
-          simp only [← Category.assoc]
-          apply eq_whisker (ht f)
-      simp [reassoced_s, reassoced_t]
+    refine hi.desc (Cofork.ofπ (t₂.desc (Cofan.mk _ fun j => q.ι.app j)) ?_)
+    apply t₁.hom_ext
+    intro ⟨j⟩
+    simp [reassoc_of% hs, reassoc_of% ht]
   uniq q m w := hi.hom_ext (i.coequalizer_ext (t₂.hom_ext fun j => by simpa using w j.1))
   fac s j := by simp
 

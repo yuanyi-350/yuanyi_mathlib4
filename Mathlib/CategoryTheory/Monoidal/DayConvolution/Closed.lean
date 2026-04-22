@@ -203,13 +203,9 @@ def coev_app : G ⟶ H where
       (fun c' => MonoidalClosed.curry <|
         (DayConvolution.unit F G).app (c', c))
         (fun {c' c''} f => by
-          have := DayConvolution.unit_naturality F G f (𝟙 c)
-          simp only [Functor.map_id, tensorHom_id] at this
-          replace this := congrArg MonoidalClosed.curry this
-          simp only [MonoidalClosed.curry_natural_right] at this
-          dsimp
-          rw [← this]
-          simp [MonoidalClosed.curry_eq])
+          convert (congrArg MonoidalClosed.curry
+            (DayConvolution.whiskerRight_comp_unit_app F G c f)).symm using 1 <;>
+            simp [MonoidalClosed.curry_natural_right, MonoidalClosed.curry_pre_app])
   naturality {c c'} f := by
     dsimp
     apply Wedge.IsLimit.hom_ext <| ℌ.isLimitWedge c'
@@ -224,12 +220,8 @@ def coev_app : G ⟶ H where
         (F := dayConvolutionInternalHomDiagramFunctor F |>.obj _ |>.obj c')
         (H.obj c') (ℌ.π c') (ℌ.hπ c'),
       Wedge.IsLimit.lift_ι_assoc, Wedge.IsLimit.lift_ι]
-    have := DayConvolution.unit_naturality F G (𝟙 j) f
-    simp only [Functor.map_id, id_tensorHom] at this
-    replace this := congrArg MonoidalClosed.curry this
-    simp only [MonoidalClosed.curry_natural_right] at this
-    rw [← this]
-    simp [MonoidalClosed.curry_eq]
+    rw [← MonoidalClosed.curry_natural_left, ← MonoidalClosed.curry_natural_right]
+    exact congrArg MonoidalClosed.curry (DayConvolution.whiskerLeft_comp_unit_app F G j f)
 
 set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
@@ -253,11 +245,7 @@ lemma coev_naturality_app {G' H' : C ⥤ V} [DayConvolution F G'] (η : G ⟶ G'
   intro j
   apply MonoidalClosed.uncurry_injective
   dsimp
-  simp only [Category.assoc, coev_app_π, Functor.comp_obj, tensor_obj,
-    map_app_comp_π, coev_app_π_assoc, MonoidalClosed.uncurry_natural_right,
-    MonoidalClosed.uncurry_curry, DayConvolution.unit_app_map_app,
-    NatTrans.id_app, id_tensorHom]
-  simp [MonoidalClosed.uncurry_natural_left]
+  simp [MonoidalClosed.uncurry_natural_left, MonoidalClosed.uncurry_ihom_map]
 
 end coev
 

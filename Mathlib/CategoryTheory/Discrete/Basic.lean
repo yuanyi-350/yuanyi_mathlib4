@@ -75,12 +75,7 @@ somewhat annoyingly we have to define `X ⟶ Y` as `ULift (PLift (X = Y))`. -/
 instance discreteCategory (α : Type u₁) : SmallCategory (Discrete α) where
   Hom X Y := ULift (PLift (X.as = Y.as))
   id _ := ULift.up (PLift.up rfl)
-  comp {X Y Z} g f := by
-    cases X
-    cases Y
-    cases Z
-    rcases f with ⟨⟨⟨⟩⟩⟩
-    exact g
+  comp g f := ULift.up (PLift.up (g.down.down.trans f.down.down))
 
 namespace Discrete
 
@@ -203,11 +198,7 @@ as the naturality squares are trivial.
 def natTrans {I : Type u₁} {F G : Discrete I ⥤ C} (f : ∀ i : Discrete I, F.obj i ⟶ G.obj i) :
     F ⟶ G where
   app := f
-  naturality := fun {X Y} ⟨⟨g⟩⟩ => by
-    discrete_cases
-    rcases g
-    change F.map (𝟙 _) ≫ _ = _ ≫ G.map (𝟙 _)
-    simp
+  naturality := fun {X Y} ⟨⟨g⟩⟩ => by cat_disch
 
 /-- For functors out of a discrete category,
 a natural isomorphism is just a collection of isomorphisms,
@@ -216,11 +207,7 @@ as the naturality squares are trivial.
 @[simps!]
 def natIso {I : Type u₁} {F G : Discrete I ⥤ C} (f : ∀ i : Discrete I, F.obj i ≅ G.obj i) :
     F ≅ G :=
-  NatIso.ofComponents f fun ⟨⟨g⟩⟩ => by
-    discrete_cases
-    rcases g
-    change F.map (𝟙 _) ≫ _ = _ ≫ G.map (𝟙 _)
-    simp
+  NatIso.ofComponents f fun {X Y} ⟨⟨g⟩⟩ => by cat_disch
 
 instance {I : Type*} {F G : Discrete I ⥤ C} (f : ∀ i, F.obj i ⟶ G.obj i) [∀ i, IsIso (f i)] :
     IsIso (Discrete.natTrans f) := by
@@ -314,12 +301,7 @@ def piEquivalenceFunctorDiscrete (J : Type u₂) (C : Type u₁) [Category.{v₁
     { obj := fun F j => F.obj ⟨j⟩
       map := fun f j => f.app ⟨j⟩ }
   unitIso := Iso.refl _
-  counitIso := NatIso.ofComponents (fun F => (NatIso.ofComponents (fun _ => Iso.refl _)
-    (by
-      rintro ⟨x⟩ ⟨y⟩ f
-      obtain rfl : x = y := Discrete.eq_of_hom f
-      obtain rfl : f = 𝟙 _ := rfl
-      simp))) (by cat_disch)
+  counitIso := NatIso.ofComponents (fun F => Discrete.natIsoFunctor.symm) (by cat_disch)
 
 /-- A category is discrete when there is at most one morphism between two objects,
 in which case they are equal. -/

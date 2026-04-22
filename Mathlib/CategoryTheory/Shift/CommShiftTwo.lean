@@ -123,11 +123,7 @@ instance precomp₁ {M : Type*} [AddCommMonoid M] [HasShift C₁ M] [HasShift C�
   commShift_flip_map {X₂ Y₂ : C₂} (g : X₂ ⟶ Y₂) :=
     inferInstanceAs (NatTrans.CommShift (whiskerLeft F (G.flip.map g)) M)
   comm X₁' X₂ m n := by
-    have := G.commShift₂_comm h (F.obj X₁') X₂ m n
-    dsimp [commShiftIso] at this ⊢
-    simp only [Category.comp_id, Category.id_comp, map_comp, Category.assoc]
-    rw [NatTrans.shift_app (G.map ((F.commShiftIso m).hom.app X₁')) n X₂]
-    simp [this]
+    simpa [commShiftIso, NatTrans.shift_app] using ((G.map _).app _ ≫= G.commShift₂_comm h (F.obj X₁') X₂ m n)
 
 set_option backward.inferInstanceAs.wrap false in
 instance precomp₂ {M : Type*} [AddCommMonoid M] [HasShift C₁ M] [HasShift C₂' M]
@@ -140,12 +136,8 @@ instance precomp₂ {M : Type*} [AddCommMonoid M] [HasShift C₁ M] [HasShift C�
   commShift_flip_map {X₂' Y₂' : C₂'} (g : X₂' ⟶ Y₂') :=
     inferInstanceAs (NatTrans.CommShift (G.flip.map (F.map g)) M)
   comm X₁ X₂' m n := by
-    have := G.commShift₂_comm h X₁ (F.obj X₂') m n
-    dsimp [commShiftIso] at this ⊢
-    simp only [Category.comp_id, Category.id_comp, Category.assoc, map_comp]
-    refine ((G.obj _).map _ ≫= this).trans ?_
-    simp only [← Category.assoc]; congr 3
-    exact (NatTrans.shift_app_comm (G.flip.map ((F.commShiftIso n).hom.app X₂')) m X₁).symm
+    simpa [commShiftIso] using ((G.obj _).map _ ≫= G.commShift₂_comm h X₁ (F.obj X₂') m n).trans
+      (NatTrans.shift_app_comm_assoc (G.flip.map _) m X₁ _).symm
 
 /- TODO : If `G : C₁ ⥤ C₂ ⥤ D` and `H : D ⥤ D'` and commute with shifts,
 and we have compatible "setups" on `D` and `D'`, show that `G ⋙ H` also commutes

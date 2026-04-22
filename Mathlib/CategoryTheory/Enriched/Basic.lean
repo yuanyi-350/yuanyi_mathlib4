@@ -351,12 +351,8 @@ def forget (F : EnrichedFunctor W C D) :
     ForgetEnrichment.homOf W
       (ForgetEnrichment.homTo W f ≫ F.map (ForgetEnrichment.to W _) (ForgetEnrichment.to W _))
   map_comp f g := by
-    dsimp
-    apply_fun ForgetEnrichment.homTo W
-    · simp only [Iso.cancel_iso_inv_left, Category.assoc, ← tensorHom_comp_tensorHom,
-        ForgetEnrichment.homTo_homOf, EnrichedFunctor.map_comp, ForgetEnrichment.homTo_comp]
-      rfl
-    · intro f g w; apply_fun ForgetEnrichment.homOf W at w; simpa using w
+    apply (Function.LeftInverse.injective (ForgetEnrichment.homOf_homTo (W := W)))
+    simp [EnrichedFunctor.map_comp, ForgetEnrichment.homTo_comp, Category.assoc]
 
 /-- `EnrichedFunctor.forget` distributes over composition of enriched functors up to isomorphism. -/
 @[simps!]
@@ -459,11 +455,7 @@ instance category : Category (EnrichedFunctor V C D) where
 @[ext]
 lemma hom_ext {F G : EnrichedFunctor V C D} {α β : F ⟶ G}
     (h : ∀ X : C, α.out.app X = β.out.app X) : α = β := by
-  rcases α with ⟨α⟩
-  rcases β with ⟨β⟩
-  congr
-  ext
-  apply h
+  exact congrArg EnrichedNatTrans.mk (NatTrans.ext (funext h))
 
 /-- To construct an isomorphism between enriched functors `F` and `G`, it suffices to construct
 a natural isomorphism between `F.forget` and `G.forget`. -/

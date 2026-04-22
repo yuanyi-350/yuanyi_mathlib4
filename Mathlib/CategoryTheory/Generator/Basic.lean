@@ -596,48 +596,32 @@ theorem IsCoseparator.isCodetector [Balanced C] {G : C} : IsCoseparator G → Is
   ObjectProperty.IsCoseparating.isCodetecting
 
 theorem isSeparator_def (G : C) :
-    IsSeparator G ↔ ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : G ⟶ X, h ≫ f = h ≫ g) → f = g :=
-  ⟨fun hG X Y f g hfg =>
-    hG _ _ fun H hH h => by
-      obtain rfl := (ObjectProperty.singleton_iff _ _).1 hH
-      exact hfg h,
-    fun hG _ _ _ _ hfg => hG _ _ fun _ => hfg _ (by simp) _⟩
+    IsSeparator G ↔ ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : G ⟶ X, h ≫ f = h ≫ g) → f = g := by
+  simp [IsSeparator, ObjectProperty.IsSeparating]
 
 theorem IsSeparator.def {G : C} :
     IsSeparator G → ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : G ⟶ X, h ≫ f = h ≫ g) → f = g :=
   (isSeparator_def _).1
 
 theorem isCoseparator_def (G : C) :
-    IsCoseparator G ↔ ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : Y ⟶ G, f ≫ h = g ≫ h) → f = g :=
-  ⟨fun hG X Y f g hfg =>
-    hG _ _ fun H hH h => by
-      obtain rfl := (ObjectProperty.singleton_iff _ _).1 hH
-      exact hfg h,
-    fun hG _ _ _ _ hfg => hG _ _ fun _ => hfg _ (by simp) _⟩
+    IsCoseparator G ↔ ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : Y ⟶ G, f ≫ h = g ≫ h) → f = g := by
+  simp [IsCoseparator, ObjectProperty.IsCoseparating]
 
 theorem IsCoseparator.def {G : C} :
     IsCoseparator G → ∀ ⦃X Y : C⦄ (f g : X ⟶ Y), (∀ h : Y ⟶ G, f ≫ h = g ≫ h) → f = g :=
   (isCoseparator_def _).1
 
 theorem isDetector_def (G : C) :
-    IsDetector G ↔ ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : G ⟶ Y, ∃! h', h' ≫ f = h) → IsIso f :=
-  ⟨fun hG X Y f hf =>
-    hG _ fun H hH h => by
-      obtain rfl := (ObjectProperty.singleton_iff _ _).1 hH
-      exact hf h,
-    fun hG _ _ _ hf => hG _ fun _ => hf _ (by simp) _⟩
+    IsDetector G ↔ ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : G ⟶ Y, ∃! h', h' ≫ f = h) → IsIso f := by
+  simp [IsDetector, ObjectProperty.IsDetecting]
 
 theorem IsDetector.def {G : C} :
     IsDetector G → ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : G ⟶ Y, ∃! h', h' ≫ f = h) → IsIso f :=
   (isDetector_def _).1
 
 theorem isCodetector_def (G : C) :
-    IsCodetector G ↔ ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : X ⟶ G, ∃! h', f ≫ h' = h) → IsIso f :=
-  ⟨fun hG X Y f hf =>
-    hG _ fun H hH h => by
-      obtain rfl := (ObjectProperty.singleton_iff _ _).1 hH
-      exact hf h,
-    fun hG _ _ _ hf => hG _ fun _ => hf _ (by simp) _⟩
+    IsCodetector G ↔ ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : X ⟶ G, ∃! h', f ≫ h' = h) → IsIso f := by
+  simp [IsCodetector, ObjectProperty.IsCodetecting]
 
 theorem IsCodetector.def {G : C} :
     IsCodetector G → ∀ ⦃X Y : C⦄ (f : X ⟶ Y), (∀ h : X ⟶ G, ∃! h', f ≫ h' = h) → IsIso f :=
@@ -781,13 +765,8 @@ theorem isDetector_iff_reflectsIsomorphisms_coyoneda_obj (G : C) :
 
 theorem isCodetector_iff_reflectsIsomorphisms_yoneda_obj (G : C) :
     IsCodetector G ↔ (yoneda.obj G).ReflectsIsomorphisms := by
-  refine ⟨fun hG => ⟨fun f hf => ?_⟩, fun h => (isCodetector_def _).2 fun X Y f hf => ?_⟩
-  · refine (isIso_unop_iff _).1 (hG.def _ ?_)
-    rwa [isIso_iff_bijective, Function.bijective_iff_existsUnique] at hf
-  · rw [← isIso_op_iff]
-    suffices IsIso ((yoneda.obj G).map f.op) by
-      exact @isIso_of_reflects_iso _ _ _ _ _ _ _ (yoneda.obj G) _ h
-    rwa [isIso_iff_bijective, Function.bijective_iff_existsUnique]
+  rw [← isDetector_op_iff, isDetector_iff_reflectsIsomorphisms_coyoneda_obj]
+  exact reflectsIsomorphisms_iso_iff (Coyoneda.objOpOp G)
 
 theorem wellPowered_of_isDetector [HasPullbacks C] (G : C) (hG : IsDetector G) :
     WellPowered.{v₁} C :=

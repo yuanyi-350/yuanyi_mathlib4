@@ -234,15 +234,7 @@ noncomputable instance forgetCreatesColimit (D : J ⥤ Algebra T)
     [PreservesColimit (D ⋙ forget T) (T : C ⥤ C)]
     [PreservesColimit ((D ⋙ forget T) ⋙ ↑T) (T : C ⥤ C)] : CreatesColimit D (forget T) :=
   createsColimitOfReflectsIso fun c t =>
-    { liftedCocone :=
-        { pt := coconePoint c t
-          ι :=
-            { app := fun j =>
-                { f := c.ι.app j
-                  h := commuting _ _ _ }
-              naturality := fun A B f => by
-                ext1
-                simpa using (c.w f) } }
+    { liftedCocone := liftedCocone c t
       validLift := Cocone.ext (Iso.refl _)
       makesColimit := liftedCoconeIsColimit _ _ }
 
@@ -568,15 +560,7 @@ noncomputable instance forgetCreatesLimit (D : J ⥤ Coalgebra T)
     [PreservesLimit (D ⋙ forget T) (T : C ⥤ C)]
     [PreservesLimit ((D ⋙ forget T) ⋙ ↑T) (T : C ⥤ C)] : CreatesLimit D (forget T) :=
   createsLimitOfReflectsIso fun c t =>
-    { liftedCone :=
-        { pt := conePoint c t
-          π :=
-            { app := fun j =>
-                { f := c.π.app j
-                  h := commuting _ _ _ }
-              naturality := fun A B f => by
-                ext1
-                simpa using (c.w f).symm } }
+    { liftedCone := liftedCone c t
       validLift := Cone.ext (Iso.refl _)
       makesLimit := liftedConeIsLimit _ _ }
 

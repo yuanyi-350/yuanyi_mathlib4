@@ -126,38 +126,15 @@ lemma equivalence_rel' [Mono f] : _root_.Equivalence (Rel' f g) where
   refl := Rel'.refl
   symm h := h.symm
   trans := by
-    rintro x y z (_ | ⟨_, _, h⟩ | s | _) hyz
-    · exact hyz
-    · obtain z₁ | z₂ := z
-      · rw [inl_rel'_inl_iff] at hyz
-        obtain rfl | ⟨_, _, h', h'', rfl⟩ := hyz
-        · exact Rel'.inl_inl _ _ h
-        · obtain rfl := (mono_iff_injective f).1 inferInstance h''
-          exact Rel'.inl_inl _ _ (h.trans h')
-      · rw [inl_rel'_inr_iff] at hyz
-        obtain ⟨s, hs, rfl⟩ := hyz
-        obtain rfl := (mono_iff_injective f).1 inferInstance hs
-        rw [← h]
-        apply Rel'.inl_inr
-    · obtain z₁ | z₂ := z
-      · replace hyz := hyz.symm
-        rw [inl_rel'_inr_iff] at hyz
-        obtain ⟨s', rfl, hs'⟩ := hyz
-        exact Rel'.inl_inl _ _ hs'
-      · rw [inr_rel'_inr_iff] at hyz
-        subst hyz
-        apply Rel'.inl_inr
-    · obtain z₁ | z₂ := z
-      · rw [inl_rel'_inl_iff] at hyz
-        obtain rfl | ⟨_, _, h, h', rfl⟩ := hyz
-        · apply Rel'.inr_inl
-        · obtain rfl := (mono_iff_injective f).1 inferInstance h'
-          rw [h]
-          apply Rel'.inr_inl
-      · rw [inl_rel'_inr_iff] at hyz
-        obtain ⟨s, hs, rfl⟩ := hyz
-        obtain rfl := (mono_iff_injective f).1 inferInstance hs
-        apply Rel'.refl
+    have inr_rel'_inl_iff (x₂ : X₂) (x₁ : X₁) :
+        Rel' f g (Sum.inr x₂) (Sum.inl x₁) ↔ ∃ s, x₁ = f s ∧ x₂ = g s := by
+      constructor
+      · intro h
+        simpa using (inl_rel'_inr_iff f g x₁ x₂).1 h.symm
+      · rintro ⟨s, rfl, rfl⟩
+        exact Rel'.inr_inl _
+    rintro x y z hxy hyz
+    cases hxy <;> cases z <;> simp_all [mono_iff_injective] <;> grind
 
 /-- The obvious equivalence `Pushout f g ≃ Pushout' f g`. -/
 def equivPushout' : Pushout f g ≃ Pushout' f g where
@@ -190,12 +167,8 @@ lemma quot_mk_eq_iff [Mono f] (a b : X₁ ⊕ X₂) :
 lemma inl_eq_inr_iff [Mono f] (x₁ : X₁) (x₂ : X₂) :
     (inl f g x₁ = inr f g x₂) ↔
       ∃ (s : S), f s = x₁ ∧ g s = x₂ := by
-  refine (Pushout.quot_mk_eq_iff f g (Sum.inl x₁) (Sum.inr x₂)).trans ?_
-  constructor
-  · rintro ⟨⟩
-    exact ⟨_, rfl, rfl⟩
-  · rintro ⟨s, rfl, rfl⟩
-    apply Rel'.inl_inr
+  simpa [eq_comm] using
+    (quot_mk_eq_iff f g (Sum.inl x₁) (Sum.inr x₂)).trans (inl_rel'_inr_iff f g x₁ x₂)
 
 instance mono_inr [Mono f] : Mono (inr f g) := by
   rw [mono_iff_injective]

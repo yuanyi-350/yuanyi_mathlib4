@@ -269,13 +269,7 @@ theorem IsUniversalColimit.map_reflective
       (IsPullback.of_hasPullback _ _).isLimit⟩⟩
   let α' := α ≫ (Functor.associator _ _ _).hom ≫ whiskerLeft F adj.counit ≫ F.rightUnitor.hom
   have hα' : NatTrans.Equifibered α' := hα.comp (.of_isIso _)
-  have hadj : ∀ X, Gl.map (adj.unit.app X) = inv (adj.counit.app _) := by
-    intro X
-    apply IsIso.eq_inv_of_inv_hom_id
-    exact adj.left_triangle_components _
-  haveI : ∀ X, IsIso (Gl.map (adj.unit.app X)) := by
-    simp_rw [hadj]
-    infer_instance
+  haveI : ∀ X, IsIso (Gl.map (adj.unit.app X)) := by infer_instance
   have hα'' : ∀ j, Gl.map (Gr.map <| α'.app j) = adj.counit.app _ ≫ α.app j := by
     intro j
     rw [← cancel_mono (adj.counit.app <| F.obj j)]
@@ -494,18 +488,10 @@ theorem BinaryCofan.isVanKampen_mk {X Y : C} (c : BinaryCofan X Y)
     let e := h.coconePointUniqueUpToIso (colimits _ _)
     obtain ⟨hl, hr⟩ := h₁ αX αY (e.inv ≫ f) (by simp [e, hX]) (by simp [e, hY])
     constructor
-    · rw [← Category.id_comp αX, ← Iso.hom_inv_id_assoc e f]
-      haveI : IsIso (𝟙 X') := inferInstance
-      have : c'.inl ≫ e.hom = 𝟙 X' ≫ (cofans X' Y').inl := by
-        dsimp [e]
-        simp
-      exact (IsPullback.of_vert_isIso ⟨this⟩).paste_vert hl
-    · rw [← Category.id_comp αY, ← Iso.hom_inv_id_assoc e f]
-      haveI : IsIso (𝟙 Y') := inferInstance
-      have : c'.inr ≫ e.hom = 𝟙 Y' ≫ (cofans X' Y').inr := by
-        dsimp [e]
-        simp
-      exact (IsPullback.of_vert_isIso ⟨this⟩).paste_vert hr
+    · exact hl.of_iso (Iso.refl _) e.symm (Iso.refl _) (Iso.refl _) (by simp [e])
+        (by simp) (by simp) (by simp)
+    · exact hr.of_iso (Iso.refl _) e.symm (Iso.refl _) (Iso.refl _) (by simp [e])
+        (by simp) (by simp) (by simp)
   · rintro ⟨H₁, H₂⟩
     refine ⟨IsColimit.ofIsoColimit ?_ <| (isoBinaryCofanMk _).symm⟩
     let e₁ : X' ≅ _ := H₁.isLimit.conePointUniqueUpToIso (limits _ _)
@@ -547,11 +533,7 @@ theorem isUniversalColimit_extendCofan {n : ℕ} (f : Fin (n + 1) → C)
     IsUniversalColimit (extendCofan c₁ c₂) := by
   intro F c α i e hα H
   let F' : Fin (n + 1) → C := F.obj ∘ Discrete.mk
-  have : F = Discrete.functor F' := by
-    apply Functor.hext
-    · exact fun i ↦ rfl
-    · rintro ⟨i⟩ ⟨j⟩ ⟨⟨rfl : i = j⟩⟩
-      simp [F']
+  have : F = Discrete.functor F' := Discrete.functor_ext fun i ↦ rfl
   have t₁' := @t₁ (Discrete.functor (fun j ↦ F.obj ⟨j.succ⟩))
     (Cofan.mk (pullback c₂.inr i) fun j ↦ pullback.lift (α.app _ ≫ c₁.inj _) (c.ι.app _) ?_)
     (Discrete.natTrans fun i ↦ α.app _) (pullback.fst _ _) ?_ (.of_discrete _) ?_
@@ -623,11 +605,7 @@ theorem isVanKampenColimit_extendCofan {n : ℕ} (f : Fin (n + 1) → C)
         Category.assoc, extendCofan_pt, Functor.const_obj_obj, NatTrans.comp_app, extendCofan_ι_app,
         Fin.cases_succ, Functor.const_map_app] using congr_app e ⟨j.succ⟩
   · let F' : Fin (n + 1) → C := F.obj ∘ Discrete.mk
-    have : F = Discrete.functor F' := by
-      apply Functor.hext
-      · exact fun i ↦ rfl
-      · rintro ⟨i⟩ ⟨j⟩ ⟨⟨rfl : i = j⟩⟩
-        simp [F']
+    have : F = Discrete.functor F' := Discrete.functor_ext fun i ↦ rfl
     clear_value F'
     subst this
     apply BinaryCofan.IsColimit.mk _ (fun {T} f₁ f₂ ↦ Hc.desc (Cofan.mk T (Fin.cases f₁
@@ -808,17 +786,10 @@ lemma IsUniversalColimit.nonempty_isColimit_of_pullbackCone_right
     (he₁ : ∀ i, d.inj i ≫ e.hom ≫ t.fst = (s i).fst ≫ a.inj i := by cat_disch)
     (he₂ : ∀ i, d.inj i ≫ e.hom ≫ t.snd = (s i).snd := by cat_disch) :
     Nonempty (IsColimit d) := by
-  let iso : d ≅ (Cofan.mk _ fun i : ι ↦ PullbackCone.IsLimit.lift ht
-      ((s i).fst ≫ a.inj i) ((s i).snd) (by simp [hu, (s i).condition])) :=
-    Cofan.ext e <| fun p ↦ PullbackCone.IsLimit.hom_ext ht (by simp [he₁]) (by simp [he₂])
-  rw [(IsColimit.equivIsoColimit iso).nonempty_congr]
-  refine hau _ (Discrete.natTrans fun i ↦ (s i.as).fst) t.fst ?_ (.of_discrete _) fun j ↦ ?_
-  · ext; simp [Cofan.inj]
-  · simp only [Discrete.functor_obj_eq_as, Cofan.mk_pt, Functor.const_obj_obj, Cofan.mk_ι_app,
-      Discrete.natTrans_app]
-    rw [← Cofan.inj]
-    refine IsPullback.of_right ?_ (by simp) (IsPullback.of_isLimit ht).flip
-    simpa [hu] using (IsPullback.of_isLimit (hs j.1)).flip
+  refine hau.nonempty_isColimit_of_pullbackCone_left f u v (fun i ↦ (s i).flip)
+    (fun i ↦ PullbackCone.flipIsLimit (hs i)) t.flip (PullbackCone.flipIsLimit ht) d e hu ?_ ?_
+  · simpa using he₂
+  · simpa using he₁
 
 section
 
@@ -847,17 +818,8 @@ lemma IsUniversalColimit.isPullback_of_isColimit_right {d : Cofan P} (hd : IsCol
     [HasPullback u v] :
     IsPullback (Cofan.IsColimit.desc hd (q₁ · ≫ a.inj _)) (Cofan.IsColimit.desc hd q₂)
       u v := by
-  let c : Cofan P := Cofan.mk (pullback u v)
-    fun i ↦ pullback.lift (q₁ i ≫ a.inj i) (q₂ i) (by simp [(hP i).w, hu])
-  obtain ⟨hc⟩ := hau.nonempty_isColimit_of_isPullback_right f u
-    v q₁ q₂ hP (IsPullback.of_hasPullback _ _) c (Iso.refl _)
-  refine (IsPullback.of_hasPullback u v).of_iso
-      ?_ (Iso.refl _) (Iso.refl _) (Iso.refl _) ?_ ?_ (by simp) (by simp)
-  · exact hc.coconePointUniqueUpToIso hd
-  · refine Cofan.IsColimit.hom_ext hc _ _ fun i ↦ ?_
-    simpa [Cofan.inj, Cofan.IsColimit.desc] using pullback.lift_fst _ _ _
-  · refine Cofan.IsColimit.hom_ext hc _ _ fun i ↦ ?_
-    simpa [Cofan.inj, Cofan.IsColimit.desc] using pullback.lift_snd _ _ _
+  haveI : HasPullback v u := hasPullback_symmetry u v
+  exact (hau.isPullback_of_isColimit_left f u v q₂ q₁ (fun i ↦ (hP i).flip) hd hu).flip
 
 end
 

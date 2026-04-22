@@ -60,13 +60,9 @@ set_option backward.isDefEq.respectTransparency false in
 @[simps]
 def functorObj (A : C ⥤ D) [MonObj A] : C ⥤ Mon D where
   obj := functorObjObj A
-  map f :=
-    { hom := A.map f
-      isMonHom_hom :=
-        { one_hom := by dsimp; rw [← η[A].naturality, tensorUnit_map]; dsimp; rw [Category.id_comp]
-          mul_hom := by dsimp; rw [← μ[A].naturality, tensorObj_map] } }
-  map_id X := by ext; dsimp; rw [CategoryTheory.Functor.map_id]
-  map_comp f g := by ext; dsimp; rw [Functor.map_comp]
+  map f := .mk' (A.map f)
+    (by simpa using (η[A].naturality f).symm)
+    (by simpa using (μ[A].naturality f).symm)
 
 /-- Functor translating a monoid object in a functor category
 to a functor into the category of monoid objects.
@@ -153,13 +149,7 @@ A comonoid object in a functor category induces a functor to the category of com
 @[simps]
 def functorObj (A : (C ⥤ D)) [ComonObj A] : C ⥤ Comon D where
   obj := functorObjObj A
-  map f :=
-    { hom := A.map f
-      isComonHom_hom.hom_counit := by
-        dsimp; rw [ε[A].naturality, tensorUnit_map]; dsimp; rw [Category.comp_id]
-      isComonHom_hom.hom_comul := by dsimp; rw [Δ[A].naturality, tensorObj_map] }
-  map_id X := by ext; dsimp; rw [CategoryTheory.Functor.map_id]
-  map_comp f g := by ext; dsimp; rw [Functor.map_comp]
+  map f := .mk' (A.map f)
 
 set_option backward.privateInPublic true in
 /-- Functor translating a comonoid object in a functor category
@@ -190,12 +180,7 @@ to a comonoid object in the functor category
 @[simps]
 private def inverse : (C ⥤ Comon D) ⥤ Comon (C ⥤ D) where
   obj := inverseObj
-  map α :=
-    { hom :=
-      { app := fun X => (α.app X).hom
-        naturality := fun _ _ f => congr_arg Comon.Hom.hom (α.naturality f) }
-      isComonHom_hom.hom_counit := by ext x; dsimp; rw [IsComonHom.hom_counit (α.app x).hom]
-      isComonHom_hom.hom_comul := by ext x; dsimp; rw [IsComonHom.hom_comul (α.app x).hom] }
+  map α := .mk' (Functor.whiskerRight α (Comon.forget D))
 
 set_option backward.privateInPublic true in
 /-- The unit for the equivalence `Comon (C ⥤ D) ≌ C ⥤ Comon D`.

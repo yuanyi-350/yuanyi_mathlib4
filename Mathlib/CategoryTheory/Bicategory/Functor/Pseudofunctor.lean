@@ -309,21 +309,10 @@ def mkOfOplax (F : B ⥤ᵒᵖᴸ C) (F' : F.PseudoCore) : B ⥤ᵖ C where
 /-- Construct a pseudofunctor from an oplax functor whose `mapId` and `mapComp` are isomorphisms. -/
 @[simps!]
 noncomputable def mkOfOplax' (F : B ⥤ᵒᵖᴸ C) [∀ a, IsIso (F.mapId a)]
-    [∀ {a b c} (f : a ⟶ b) (g : b ⟶ c), IsIso (F.mapComp f g)] : B ⥤ᵖ C where
-  toPrelaxFunctor := F.toPrelaxFunctor
-  mapId := fun a => asIso (F.mapId a)
-  mapComp := fun f g => asIso (F.mapComp f g)
-  map₂_whisker_left := fun f g h η => by
-    dsimp
-    rw [← assoc, IsIso.eq_comp_inv, F.mapComp_naturality_right]
-  map₂_whisker_right := fun η h => by
-    dsimp
-    rw [← assoc, IsIso.eq_comp_inv, F.mapComp_naturality_left]
-  map₂_associator := fun f g h => by
-    dsimp
-    simp only [← assoc]
-    rw [IsIso.eq_comp_inv, ← Bicategory.inv_whiskerLeft, IsIso.eq_comp_inv]
-    simp only [assoc, F.map₂_associator]
+    [∀ {a b c} (f : a ⟶ b) (g : b ⟶ c), IsIso (F.mapComp f g)] : B ⥤ᵖ C :=
+  mkOfOplax F
+    { mapIdIso := fun a => asIso (F.mapId a)
+      mapCompIso := fun f g => asIso (F.mapComp f g) }
 
 /-- Construct a pseudofunctor from a lax functor whose `mapId` and `mapComp` are isomorphisms. -/
 @[simps]

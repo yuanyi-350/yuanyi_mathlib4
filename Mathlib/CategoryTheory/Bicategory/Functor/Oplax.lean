@@ -123,16 +123,12 @@ lemma mapComp_assoc_left {a b c d : B} (f : a ⟶ b) (g : b ⟶ c) (h : c ⟶ d)
 @[reassoc]
 theorem mapComp_id_left {a b : B} (f : a ⟶ b) :
     F.mapComp (𝟙 a) f ≫ F.mapId a ▷ F.map f = F.map₂ (λ_ f).hom ≫ (λ_ (F.map f)).inv := by
-  rw [Iso.eq_comp_inv]
-  simp only [Category.assoc]
-  rw [← F.map₂_leftUnitor]
+  cat_disch
 
 @[reassoc]
 theorem mapComp_id_right {a b : B} (f : a ⟶ b) :
     F.mapComp f (𝟙 b) ≫ F.map f ◁ F.mapId b = F.map₂ (ρ_ f).hom ≫ (ρ_ (F.map f)).inv := by
-  rw [Iso.eq_comp_inv]
-  simp only [Category.assoc]
-  rw [← F.map₂_rightUnitor]
+  cat_disch
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The identity oplax functor. -/
@@ -188,14 +184,8 @@ def comp (F : B ⥤ᵒᵖᴸ C) (G : C ⥤ᵒᵖᴸ D) : B ⥤ᵒᵖᴸ D where
       whiskerLeft_comp, assoc]
     simp only [map₂_associator, PrelaxFunctor.map₂_comp, mapComp_naturality_left_assoc,
       comp_whiskerRight, assoc]
-  map₂_leftUnitor := fun f => by
-    dsimp
-    simp only [map₂_leftUnitor, PrelaxFunctor.map₂_comp, mapComp_naturality_left_assoc,
-      comp_whiskerRight, assoc]
-  map₂_rightUnitor := fun f => by
-    dsimp
-    simp only [map₂_rightUnitor, PrelaxFunctor.map₂_comp, mapComp_naturality_right_assoc,
-      whiskerLeft_comp, assoc]
+  map₂_leftUnitor := fun f => by simp
+  map₂_rightUnitor := fun f => by simp
 
 /-- A structure on an oplax functor that promotes an oplax functor to a pseudofunctor.
 

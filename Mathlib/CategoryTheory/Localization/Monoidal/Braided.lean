@@ -89,12 +89,8 @@ lemma map_hexagon_forward (X Y Z : C) :
         (α_ ((L').obj Y) ((L').obj X) ((L').obj Z)).hom ≫
         ((L').obj Y) ◁ (((braidingNatIso L W ε).app ((L').obj X)).app ((L').obj Z)).hom := by
   simp only [associator_hom, Iso.app_hom, braidingNatIso_hom_app]
-  slice_rhs 0 4 =>
-    simp only [Functor.flip_obj_obj, Functor.CoreMonoidal.toMonoidal_toLaxMonoidal,
-      Functor.CoreMonoidal.toMonoidal_toOplaxMonoidal, comp_whiskerRight, assoc,
-      Functor.Monoidal.whiskerRight_δ_μ_assoc, Functor.LaxMonoidal.μ_natural_left]
-  slice_lhs 6 7 =>
-    rw [braidingNatIso_hom_app_naturality_μ_left, braidingNatIso_hom_app]
+  slice_rhs 0 4 => simp
+  rw [braidingNatIso_hom_app_naturality_μ_left_assoc, braidingNatIso_hom_app]
   simp
 
 set_option backward.isDefEq.respectTransparency false in
@@ -107,12 +103,8 @@ lemma map_hexagon_reverse (X Y Z : C) :
         (α_ ((L').obj X) ((L').obj Z) ((L').obj Y)).inv ≫
         (((braidingNatIso L W ε).app ((L').obj X)).app ((L').obj Z)).hom ▷ ((L').obj Y) := by
   simp only [associator_inv, Iso.app_hom, braidingNatIso_hom_app]
-  slice_rhs 0 4 =>
-    simp only [Functor.flip_obj_obj, Functor.CoreMonoidal.toMonoidal_toLaxMonoidal,
-      Functor.CoreMonoidal.toMonoidal_toOplaxMonoidal, MonoidalCategory.whiskerLeft_comp, assoc,
-      Functor.Monoidal.whiskerLeft_δ_μ, comp_id]
-  slice_lhs 6 7 =>
-    rw [braidingNatIso_hom_app_naturality_μ_right, braidingNatIso_hom_app]
+  slice_rhs 0 4 => simp
+  rw [braidingNatIso_hom_app_naturality_μ_right_assoc, braidingNatIso_hom_app]
   simp
 
 noncomputable instance : BraidedCategory (LocalizedMonoidal L W ε) := by

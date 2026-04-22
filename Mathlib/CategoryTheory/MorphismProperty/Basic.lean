@@ -73,22 +73,12 @@ lemma of_eq_top {P : MorphismProperty C} (h : P = ⊤) {X Y : C} (f : X ⟶ Y) :
 @[simp]
 lemma sSup_iff (S : Set (MorphismProperty C)) {X Y : C} (f : X ⟶ Y) :
     sSup S f ↔ ∃ (W : S), W.1 f := by
-  dsimp [sSup, iSup]
-  constructor
-  · rintro ⟨_, ⟨⟨_, ⟨⟨_, ⟨_, h⟩, rfl⟩, rfl⟩⟩, rfl⟩, hf⟩
-    exact ⟨⟨_, h⟩, hf⟩
-  · rintro ⟨⟨W, hW⟩, hf⟩
-    exact ⟨_, ⟨⟨_, ⟨_, ⟨⟨W, hW⟩, rfl⟩⟩, rfl⟩, rfl⟩, hf⟩
+  simpa [sSup, iSup] using (Set.exists_range_iff (f := fun W : S => W.1 f) (p := id))
 
 @[simp]
 lemma iSup_iff {ι : Sort*} (W : ι → MorphismProperty C) {X Y : C} (f : X ⟶ Y) :
     iSup W f ↔ ∃ i, W i f := by
-  apply (sSup_iff (Set.range W) f).trans
-  constructor
-  · rintro ⟨⟨_, i, rfl⟩, hf⟩
-    exact ⟨i, hf⟩
-  · rintro ⟨i, hf⟩
-    exact ⟨⟨_, i, rfl⟩, hf⟩
+  rw [iSup, sSup_iff, Set.exists_subtype_range_iff]
 
 /-- The morphism property in `Cᵒᵖ` associated to a morphism property in `C` -/
 @[simp]
@@ -508,25 +498,13 @@ end
 lemma isomorphisms_op : (isomorphisms C).op = isomorphisms Cᵒᵖ := op_isomorphisms _
 
 instance RespectsIso.monomorphisms : RespectsIso (monomorphisms C) := by
-  apply RespectsIso.mk <;>
-    · intro X Y Z e f
-      simp only [monomorphisms.iff]
-      intro
-      apply mono_comp
+  apply RespectsIso.mk <;> intros <;> infer_instance
 
 instance RespectsIso.epimorphisms : RespectsIso (epimorphisms C) := by
-  apply RespectsIso.mk <;>
-    · intro X Y Z e f
-      simp only [epimorphisms.iff]
-      intro
-      apply epi_comp
+  apply RespectsIso.mk <;> intros <;> infer_instance
 
 instance RespectsIso.isomorphisms : RespectsIso (isomorphisms C) := by
-  apply RespectsIso.mk <;>
-    · intro X Y Z e f
-      simp only [isomorphisms.iff]
-      intro
-      exact IsIso.comp_isIso
+  apply RespectsIso.mk <;> intros <;> infer_instance
 
 end
 

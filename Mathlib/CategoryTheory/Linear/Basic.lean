@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Algebra.Defs
 public import Mathlib.Algebra.Module.TransferInstance
 public import Mathlib.Algebra.Group.Invertible.Defs
 public import Mathlib.Algebra.Module.Equiv.Defs
+public import Mathlib.CategoryTheory.HomCongr
 public import Mathlib.CategoryTheory.Preadditive.Basic
 
 /-!
@@ -147,24 +148,14 @@ instance {X Y : C} (f : X ⟶ Y) [Mono f] (r : R) [Invertible r] : Mono (r • f
 isomorphism between `Hom(X, W)` and `Hom(Y, Z).` -/
 def homCongr (k : Type*) {C : Type*} [Category* C] [Semiring k] [Preadditive C] [Linear k C]
     {X Y W Z : C} (f₁ : X ≅ Y) (f₂ : W ≅ Z) : (X ⟶ W) ≃ₗ[k] Y ⟶ Z :=
-  {
-    (rightComp k Y f₂.hom).comp
-      (leftComp k W
-        f₁.symm.hom) with
-    invFun := (leftComp k W f₁.hom).comp (rightComp k Y f₂.symm.hom)
-    left_inv := fun x => by
-      simp only [Iso.symm_hom, LinearMap.toFun_eq_coe, LinearMap.coe_comp, Function.comp_apply,
-        leftComp_apply, rightComp_apply, Category.assoc, Iso.hom_inv_id, Category.comp_id,
-        Iso.hom_inv_id_assoc]
-    right_inv := fun x => by
-      simp only [Iso.symm_hom, LinearMap.coe_comp, Function.comp_apply, rightComp_apply,
-        leftComp_apply, LinearMap.toFun_eq_coe, Iso.inv_hom_id_assoc, Category.assoc,
-        Iso.inv_hom_id, Category.comp_id] }
+  { f₁.homCongr f₂ with
+    map_add' := by simp
+    map_smul' := by simp }
 
 theorem homCongr_apply (k : Type*) {C : Type*} [Category* C] [Semiring k] [Preadditive C]
     [Linear k C] {X Y W Z : C} (f₁ : X ≅ Y) (f₂ : W ≅ Z) (f : X ⟶ W) :
     homCongr k f₁ f₂ f = (f₁.inv ≫ f) ≫ f₂.hom :=
-  rfl
+  by simp [homCongr]
 
 theorem homCongr_symm_apply (k : Type*) {C : Type*} [Category* C] [Semiring k] [Preadditive C]
     [Linear k C] {X Y W Z : C} (f₁ : X ≅ Y) (f₂ : W ≅ Z) (f : Y ⟶ Z) :
@@ -193,14 +184,8 @@ variable {S : Type w} [CommSemiring S] [Linear S C]
 @[simps]
 def comp (X Y Z : C) : (X ⟶ Y) →ₗ[S] (Y ⟶ Z) →ₗ[S] X ⟶ Z where
   toFun f := leftComp S Z f
-  map_add' := by
-    intros
-    ext
-    simp
-  map_smul' := by
-    intros
-    ext
-    simp
+  map_add' := by cat_disch
+  map_smul' := by cat_disch
 
 end
 

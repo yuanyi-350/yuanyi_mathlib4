@@ -131,13 +131,9 @@ theorem final_of_adjunction {L : C ⥤ D} {R : D ⥤ C} (adj : L ⊣ R) : Final 
   { out := fun c =>
       let u : StructuredArrow c R := StructuredArrow.mk (adj.unit.app c)
       @zigzag_isConnected _ _ ⟨u⟩ fun f g =>
-        Relation.ReflTransGen.trans
-          (Relation.ReflTransGen.single
-            (show Zag f u from
-              Or.inr ⟨StructuredArrow.homMk ((adj.homEquiv c f.right).symm f.hom) (by simp [u])⟩))
-          (Relation.ReflTransGen.single
-            (show Zag u g from
-              Or.inl ⟨StructuredArrow.homMk ((adj.homEquiv c g.right).symm g.hom) (by simp [u])⟩)) }
+        Zigzag.of_inv_hom (j₂ := u)
+          (StructuredArrow.homMk ((adj.homEquiv c f.right).symm f.hom) (by simp [u]))
+          (StructuredArrow.homMk ((adj.homEquiv c g.right).symm g.hom) (by simp [u])) }
 
 set_option backward.isDefEq.respectTransparency false in
 /-- If a functor `L : C ⥤ D` is a left adjoint, it is initial. -/
@@ -145,13 +141,9 @@ theorem initial_of_adjunction {L : C ⥤ D} {R : D ⥤ C} (adj : L ⊣ R) : Init
   { out := fun d =>
       let u : CostructuredArrow L d := CostructuredArrow.mk (adj.counit.app d)
       @zigzag_isConnected _ _ ⟨u⟩ fun f g =>
-        Relation.ReflTransGen.trans
-          (Relation.ReflTransGen.single
-            (show Zag f u from
-              Or.inl ⟨CostructuredArrow.homMk (adj.homEquiv f.left d f.hom) (by simp [u])⟩))
-          (Relation.ReflTransGen.single
-            (show Zag u g from
-              Or.inr ⟨CostructuredArrow.homMk (adj.homEquiv g.left d g.hom) (by simp [u])⟩)) }
+        Zigzag.of_hom_inv (j₂ := u)
+          (CostructuredArrow.homMk (adj.homEquiv f.left d f.hom) (by simp [u]))
+          (CostructuredArrow.homMk (adj.homEquiv g.left d g.hom) (by simp [u])) }
 
 instance (priority := 100) final_of_isRightAdjoint (F : C ⥤ D) [IsRightAdjoint F] : Final F :=
   final_of_adjunction (Adjunction.ofIsRightAdjoint F)
@@ -263,18 +255,7 @@ lemma extendCocone_obj_ι_app' (c : Cocone (F ⋙ G)) {X : D} {Y : C} (f : X ⟶
 @[simp]
 theorem colimit_cocone_comp_aux (s : Cocone (F ⋙ G)) (j : C) :
     G.map (homToLift F (F.obj j)) ≫ s.ι.app (lift F (F.obj j)) = s.ι.app j := by
-  -- This point is that this would be true if we took `lift (F.obj j)` to just be `j`
-  -- and `homToLift (F.obj j)` to be `𝟙 (F.obj j)`.
-  apply induction F fun X k => G.map k ≫ s.ι.app X = (s.ι.app j :)
-  · intro j₁ j₂ k₁ k₂ f w h
-    rw [← w]
-    rw [← s.w f] at h
-    simpa using h
-  · intro j₁ j₂ k₁ k₂ f w h
-    rw [← w] at h
-    rw [← s.w f]
-    simpa using h
-  · exact s.w (𝟙 _)
+  simpa using (extendCocone_obj_ι_app' (F := F) (G := G) s (𝟙 (F.obj j)))
 
 variable (F G)
 
@@ -457,19 +438,10 @@ theorem zigzag_of_eqvGen_colimitTypeRel {F : C ⥤ D} {d : D} {f₁ f₂ : Σ X,
   induction t with
   | rel x y r =>
     obtain ⟨f, w⟩ := r
-    fconstructor
-    swap
-    · fconstructor
-    left; fconstructor
-    exact StructuredArrow.homMk f
-  | refl => fconstructor
-  | symm x y _ ih =>
-    apply zigzag_symmetric
-    exact ih
-  | trans x y z _ _ ih₁ ih₂ =>
-    apply Relation.ReflTransGen.trans
-    · exact ih₁
-    · exact ih₂
+    exact Zigzag.of_hom (StructuredArrow.homMk f)
+  | refl => exact Zigzag.refl _
+  | symm x y _ ih => exact ih.symm
+  | trans x y z _ _ ih₁ ih₂ => exact ih₁.trans ih₂
 
 end Final
 
@@ -619,18 +591,7 @@ lemma extendCone_obj_π_app' (c : Cone (F ⋙ G)) {X : C} {Y : D} (f : F.obj X �
 @[simp]
 theorem limit_cone_comp_aux (s : Cone (F ⋙ G)) (j : C) :
     s.π.app (lift F (F.obj j)) ≫ G.map (homToLift F (F.obj j)) = s.π.app j := by
-  -- This point is that this would be true if we took `lift (F.obj j)` to just be `j`
-  -- and `homToLift (F.obj j)` to be `𝟙 (F.obj j)`.
-  apply induction F fun X k => s.π.app X ≫ G.map k = (s.π.app j :)
-  · intro j₁ j₂ k₁ k₂ f w h
-    rw [← s.w f]
-    rw [← w] at h
-    simpa using h
-  · intro j₁ j₂ k₁ k₂ f w h
-    rw [← s.w f] at h
-    rw [← w]
-    simpa using h
-  · exact s.w (𝟙 _)
+  simpa using (extendCone_obj_π_app' (F := F) (G := G) s (𝟙 (F.obj j)))
 
 variable (F G)
 

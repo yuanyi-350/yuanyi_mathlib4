@@ -198,11 +198,7 @@ theorem unop_left_comp_ofMkLEMk_unop {A : CostructuredArrow S T} {P Q : (Costruc
     {f : P ⟶ op A} {g : Q ⟶ op A} [Mono f.unop.left.op] [Mono g.unop.left.op]
     (h : Subobject.mk f.unop.left.op ≤ Subobject.mk g.unop.left.op) :
     g.unop.left ≫ (Subobject.ofMkLEMk f.unop.left.op g.unop.left.op h).unop = f.unop.left := by
-  conv_lhs =>
-    congr
-    rw [← Quiver.Hom.unop_op g.unop.left]
-  rw [← unop_comp]
-  simp only [Subobject.ofMkLEMk_comp, Quiver.Hom.unop_op]
+  exact congr_arg Quiver.Hom.unop (Subobject.ofMkLEMk_comp h)
 
 set_option backward.isDefEq.respectTransparency false in
 /-- If `A : S.obj B ⟶ T` is a costructured arrow for `S : C ⥤ D` and `T : D`, then we can
@@ -227,11 +223,7 @@ def quotientEquiv [HasFiniteColimits C] [PreservesFiniteColimits S] (A : Costruc
       ext
       exact unop_left_comp_ofMkLEMk_unop _
     · refine Subobject.mk_le_mk_of_comm (Subobject.ofMkLEMk _ _ h).unop.left.op ?_
-      refine Quiver.Hom.unop_inj ?_
-      have := congr_arg Quiver.Hom.unop (Subobject.ofMkLEMk_comp h)
-      simpa only [unop_op, Functor.id_obj, Functor.const_obj_obj, MonoOver.mk_obj, Over.mk_left,
-        MonoOver.mk_arrow, unop_comp, Quiver.Hom.unop_op, comp_left]
-          using congr_arg CommaMorphism.left this
+      exact Quiver.Hom.unop_inj (congr_arg (fun k => k.unop.left) (Subobject.ofMkLEMk_comp h))
 
 /-- If `C` is well-copowered and cocomplete and `S` preserves colimits, then
     `CostructuredArrow S T` is well-copowered. -/

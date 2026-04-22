@@ -30,72 +30,33 @@ variable (C : Type u₁) [Category.{v₁} C] [Preadditive C] (T : Monad C)
 open CategoryTheory.Limits Preadditive
 
 /-- The category of algebras over an additive monad on a preadditive category is preadditive. -/
-@[simps]
+@[simps!]
 instance Monad.algebraPreadditive : Preadditive (Monad.Algebra T) where
-  homGroup F G :=
-    { add := fun α β =>
+  homGroup F G := by
+    letI : Add (F ⟶ G) := ⟨fun α β =>
         { f := α.f + β.f
-          h := by simp only [Functor.map_add, add_comp, Monad.Algebra.Hom.h, comp_add] }
-      zero :=
+          h := by simp only [Functor.map_add, add_comp, Monad.Algebra.Hom.h, comp_add] }⟩
+    letI : Zero (F ⟶ G) := ⟨
         { f := 0
-          h := by simp only [Functor.map_zero, zero_comp, comp_zero] }
-      nsmul := fun n α =>
+          h := by simp only [Functor.map_zero, zero_comp, comp_zero] }⟩
+    letI : SMul ℕ (F ⟶ G) := ⟨fun n α =>
         { f := n • α.f
-          h := by rw [Functor.map_nsmul, nsmul_comp, Monad.Algebra.Hom.h, comp_nsmul] }
-      neg := fun α =>
+          h := by rw [Functor.map_nsmul, nsmul_comp, Monad.Algebra.Hom.h, comp_nsmul] }⟩
+    letI : Neg (F ⟶ G) := ⟨fun α =>
         { f := -α.f
-          h := by simp only [Functor.map_neg, neg_comp, Monad.Algebra.Hom.h, comp_neg] }
-      sub := fun α β =>
+          h := by simp only [Functor.map_neg, neg_comp, Monad.Algebra.Hom.h, comp_neg] }⟩
+    letI : Sub (F ⟶ G) := ⟨fun α β =>
         { f := α.f - β.f
-          h := by simp only [Functor.map_sub, sub_comp, Monad.Algebra.Hom.h, comp_sub] }
-      zsmul := fun r α =>
+          h := by simp only [Functor.map_sub, sub_comp, Monad.Algebra.Hom.h, comp_sub] }⟩
+    letI : SMul ℤ (F ⟶ G) := ⟨fun r α =>
         { f := r • α.f
-          h := by rw [Functor.map_zsmul, zsmul_comp, Monad.Algebra.Hom.h, comp_zsmul] }
-      add_assoc := by
-        intros
+          h := by rw [Functor.map_zsmul, zsmul_comp, Monad.Algebra.Hom.h, comp_zsmul] }⟩
+    exact
+      (show Function.Injective (fun α : F ⟶ G => α.f) from by
+        intro α β h
         ext
-        apply add_assoc
-      zero_add := by
-        intros
-        ext
-        apply zero_add
-      add_zero := by
-        intros
-        ext
-        apply add_zero
-      nsmul_zero := by
-        intros
-        ext
-        apply zero_smul
-      nsmul_succ := by
-        intros
-        ext
-        apply succ_nsmul
-      sub_eq_add_neg := by
-        intros
-        ext
-        apply sub_eq_add_neg
-      zsmul_zero' := by
-        intros
-        ext
-        apply zero_smul
-      zsmul_succ' := by
-        intros
-        ext
-        simp only [natCast_zsmul, succ_nsmul]
-        rfl
-      zsmul_neg' := by
-        intros
-        ext
-        simp only [negSucc_zsmul, ← Nat.cast_smul_eq_nsmul ℤ]
-      neg_add_cancel := by
-        intros
-        ext
-        apply neg_add_cancel
-      add_comm := by
-        intros
-        ext
-        apply add_comm }
+        exact h).addCommGroup (fun α => α.f) rfl (fun _ _ => rfl) (fun _ => rfl)
+        (fun _ _ => rfl) (fun _ _ => rfl) fun _ _ => rfl
   add_comp := by
     intros
     ext
@@ -110,72 +71,33 @@ instance Monad.forget_additive : (Monad.forget T).Additive where
 variable (U : Comonad C) [Functor.Additive (U : C ⥤ C)]
 
 /-- The category of coalgebras over an additive comonad on a preadditive category is preadditive. -/
-@[simps]
+@[simps!]
 instance Comonad.coalgebraPreadditive : Preadditive (Comonad.Coalgebra U) where
-  homGroup F G :=
-    { add := fun α β =>
+  homGroup F G := by
+    letI : Add (F ⟶ G) := ⟨fun α β =>
         { f := α.f + β.f
-          h := by simp only [Functor.map_add, comp_add, Comonad.Coalgebra.Hom.h, add_comp] }
-      zero :=
+          h := by simp only [Functor.map_add, comp_add, Comonad.Coalgebra.Hom.h, add_comp] }⟩
+    letI : Zero (F ⟶ G) := ⟨
         { f := 0
-          h := by simp only [Functor.map_zero, comp_zero, zero_comp] }
-      nsmul := fun n α =>
+          h := by simp only [Functor.map_zero, comp_zero, zero_comp] }⟩
+    letI : SMul ℕ (F ⟶ G) := ⟨fun n α =>
         { f := n • α.f
-          h := by rw [Functor.map_nsmul, comp_nsmul, Comonad.Coalgebra.Hom.h, nsmul_comp] }
-      neg := fun α =>
+          h := by rw [Functor.map_nsmul, comp_nsmul, Comonad.Coalgebra.Hom.h, nsmul_comp] }⟩
+    letI : Neg (F ⟶ G) := ⟨fun α =>
         { f := -α.f
-          h := by simp only [Functor.map_neg, comp_neg, Comonad.Coalgebra.Hom.h, neg_comp] }
-      sub := fun α β =>
+          h := by simp only [Functor.map_neg, comp_neg, Comonad.Coalgebra.Hom.h, neg_comp] }⟩
+    letI : Sub (F ⟶ G) := ⟨fun α β =>
         { f := α.f - β.f
-          h := by simp only [Functor.map_sub, comp_sub, Comonad.Coalgebra.Hom.h, sub_comp] }
-      zsmul := fun r α =>
+          h := by simp only [Functor.map_sub, comp_sub, Comonad.Coalgebra.Hom.h, sub_comp] }⟩
+    letI : SMul ℤ (F ⟶ G) := ⟨fun r α =>
         { f := r • α.f
-          h := by rw [Functor.map_zsmul, comp_zsmul, Comonad.Coalgebra.Hom.h, zsmul_comp] }
-      add_assoc := by
-        intros
+          h := by rw [Functor.map_zsmul, comp_zsmul, Comonad.Coalgebra.Hom.h, zsmul_comp] }⟩
+    exact
+      (show Function.Injective (fun α : F ⟶ G => α.f) from by
+        intro α β h
         ext
-        apply add_assoc
-      zero_add := by
-        intros
-        ext
-        apply zero_add
-      add_zero := by
-        intros
-        ext
-        apply add_zero
-      nsmul_zero := by
-        intros
-        ext
-        apply zero_smul
-      nsmul_succ := by
-        intros
-        ext
-        apply succ_nsmul
-      sub_eq_add_neg := by
-        intros
-        ext
-        apply sub_eq_add_neg
-      zsmul_zero' := by
-        intros
-        ext
-        apply zero_smul
-      zsmul_succ' := by
-        intros
-        ext
-        simp only [natCast_zsmul, succ_nsmul]
-        rfl
-      zsmul_neg' := by
-        intros
-        ext
-        simp only [negSucc_zsmul, ← Nat.cast_smul_eq_nsmul ℤ]
-      neg_add_cancel := by
-        intros
-        ext
-        apply neg_add_cancel
-      add_comm := by
-        intros
-        ext
-        apply add_comm }
+        exact h).addCommGroup (fun α => α.f) rfl (fun _ _ => rfl) (fun _ => rfl)
+        (fun _ _ => rfl) (fun _ _ => rfl) fun _ _ => rfl
   add_comp := by
     intros
     ext

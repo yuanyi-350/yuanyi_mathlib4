@@ -153,12 +153,7 @@ def toSuccArrow (X : C) : Arrow C := Arrow.mk (Φ.toSucc X)
 
 lemma prop_iff {X Y : C} (f : X ⟶ Y) :
     Φ.prop f ↔ Arrow.mk f = Φ.toSuccArrow X := by
-  constructor
-  · rintro ⟨_⟩
-    rfl
-  · intro h
-    rw [← Φ.prop.arrow_mk_mem_toSet_iff, h]
-    apply prop_toSucc
+  simp [prop, MorphismProperty.ofHoms_iff, toSuccArrow, Arrow.mk_eq_mk_iff]
 
 variable {Φ}
 
@@ -283,13 +278,9 @@ value on smaller elements. -/
 noncomputable def isColimit (i : J) (hi : Order.IsSuccLimit i) (hij : i ≤ j) :
     IsColimit (coconeOfLE iter.F hij) := by
   letI := hasColimitsOfShape_of_isSuccLimit C i hi
-  refine IsColimit.ofIsoColimit (colimit.isColimit (restrictionLT iter.F hij))
-    (Cocone.ext (eqToIso (iter.obj_limit i hi hij).symm) ?_)
-  rintro ⟨k, hk⟩
-  apply Arrow.mk_injective
-  dsimp
-  rw [← arrowMap]
-  simp [iter.arrowMap_limit i hi hij k hk, arrowι_def]
+  exact IsColimit.ofIsoColimit (colimit.isColimit (restrictionLT iter.F hij)) <|
+    Cocone.ext (eqToIso (iter.obj_limit i hi hij).symm) fun ⟨k, hk⟩ ↦
+      (Arrow.mk_inj _ _).1 (by simpa [arrowι_def] using (iter.arrowMap_limit _ hi hij _ hk).symm)
 
 /-- The element in `Φ.Iteration i` that is deduced from an element
 in `Φ.Iteration j` when `i ≤ j`. -/

@@ -54,11 +54,7 @@ lemma ofSection_le_iff (G : Subfunctor F) :
 @[simp]
 lemma ofSection_image {F' : Cᵒᵖ ⥤ Type w} (f : F ⟶ F') :
     (ofSection x).image f = ofSection (f.app _ x) := by
-  apply le_antisymm
-  · rw [image_le_iff, ofSection_le_iff, preimage_obj, Set.mem_preimage]
-    exact ⟨𝟙 X, by simp⟩
-  · simp only [ofSection_le_iff, image_obj, Set.mem_image]
-    exact ⟨x, mem_ofSection_obj x, rfl⟩
+  aesop (add simp [image_obj, ofSection_obj, FunctorToTypes.naturality])
 
 end
 
@@ -68,14 +64,7 @@ variable {F : Cᵒᵖ ⥤ Type v}
 
 lemma ofSection_eq_range {X : Cᵒᵖ} (x : F.obj X) :
     ofSection x = range (yonedaEquiv.symm x) := by
-  ext U y
-  simp only [ofSection_obj, Set.mem_setOf_eq, Opposite.op_unop, range_obj, yoneda_obj_obj,
-    Set.mem_range]
-  constructor
-  · rintro ⟨f, rfl⟩
-    exact ⟨f.unop, rfl⟩
-  · rintro ⟨f, rfl⟩
-    exact ⟨f.op, rfl⟩
+  aesop (add simp [ofSection_obj, range_obj])
 
 lemma range_eq_ofSection {X : C} (f : yoneda.obj X ⟶ F) :
     range f = ofSection (yonedaEquiv f) := by
@@ -89,14 +78,7 @@ variable {F : Cᵒᵖ ⥤ Type max v w}
 
 lemma ofSection_eq_range' {X : Cᵒᵖ} (x : F.obj X) :
     ofSection x = range (uliftYonedaEquiv.symm x) := by
-  ext U y
-  dsimp [uliftYonedaEquiv]
-  simp only [Set.mem_range, ULift.exists]
-  constructor
-  · rintro ⟨f, rfl⟩
-    exact ⟨f.unop, rfl⟩
-  · rintro ⟨f, rfl⟩
-    exact ⟨f.op, rfl⟩
+  aesop (add simp [ofSection_obj, range_obj])
 
 set_option backward.isDefEq.respectTransparency false in
 lemma range_eq_ofSection' {X : C} (f : yoneda.obj X ⋙ uliftFunctor.{w} ⟶ F) :

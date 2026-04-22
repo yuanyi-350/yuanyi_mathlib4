@@ -119,18 +119,10 @@ theorem whiskering_preadditiveCoyoneda :
   rfl
 
 instance full_preadditiveYoneda : (preadditiveYoneda : C ⥤ Cᵒᵖ ⥤ AddCommGrpCat).Full :=
-  let _ : Functor.Full (preadditiveYoneda ⋙
-      (whiskeringRight Cᵒᵖ AddCommGrpCat (Type v)).obj (forget AddCommGrpCat)) :=
-    Yoneda.yoneda_full
-  Functor.Full.of_comp_faithful preadditiveYoneda
-    ((whiskeringRight Cᵒᵖ AddCommGrpCat (Type v)).obj (forget AddCommGrpCat))
+  Functor.Full.of_comp_faithful_iso (eqToIso whiskering_preadditiveYoneda)
 
 instance full_preadditiveCoyoneda : (preadditiveCoyoneda : Cᵒᵖ ⥤ C ⥤ AddCommGrpCat).Full :=
-  let _ : Functor.Full (preadditiveCoyoneda ⋙
-      (whiskeringRight C AddCommGrpCat (Type v)).obj (forget AddCommGrpCat)) :=
-    Coyoneda.coyoneda_full
-  Functor.Full.of_comp_faithful preadditiveCoyoneda
-    ((whiskeringRight C AddCommGrpCat (Type v)).obj (forget AddCommGrpCat))
+  Functor.Full.of_comp_faithful_iso (eqToIso whiskering_preadditiveCoyoneda)
 
 instance faithful_preadditiveYoneda : (preadditiveYoneda : C ⥤ Cᵒᵖ ⥤ AddCommGrpCat).Faithful :=
   Functor.Faithful.of_comp_eq whiskering_preadditiveYoneda

@@ -573,11 +573,7 @@ set_option backward.isDefEq.respectTransparency false in
 def isLimitConeOfAdj (F : J ⥤ C) :
     IsLimit (coneOfAdj adj F) where
   lift s := adj.homEquiv _ _ s.π
-  fac s j := by
-    have eq := NatTrans.congr_app (adj.counit.naturality s.π) j
-    have eq' := NatTrans.congr_app (adj.left_triangle_components s.pt) j
-    dsimp at eq eq' ⊢
-    rw [adj.homEquiv_unit, assoc, eq, reassoc_of% eq']
+  fac s j := by simpa using congr_app ((adj.homEquiv_counit _ F ((adj.homEquiv _ F) s.π)).symm) j
   uniq s m hm := (adj.homEquiv _ _).symm.injective (by ext j; simpa using hm j)
 
 end Adjunction
@@ -1193,56 +1189,32 @@ section Opposite
 def IsLimit.op {t : Cone F} (P : IsLimit t) : IsColimit t.op where
   desc s := (P.lift s.unop).op
   fac s j := congrArg Quiver.Hom.op (P.fac s.unop (unop j))
-  uniq s m w := by
-    dsimp
-    rw [← P.uniq s.unop m.unop]
-    · rfl
-    · dsimp
-      intro j
-      rw [← w]
-      rfl
+  uniq s m w := Quiver.Hom.unop_inj <|
+    P.uniq s.unop m.unop fun j => Quiver.Hom.op_inj <| w (.op j)
 
 /-- If `t : Cocone F` is a colimit cocone, then `t.op : Cone F.op` is a limit cone.
 -/
 def IsColimit.op {t : Cocone F} (P : IsColimit t) : IsLimit t.op where
   lift s := (P.desc s.unop).op
   fac s j := congrArg Quiver.Hom.op (P.fac s.unop (unop j))
-  uniq s m w := by
-    dsimp
-    rw [← P.uniq s.unop m.unop]
-    · rfl
-    · dsimp
-      intro j
-      rw [← w]
-      rfl
+  uniq s m w := Quiver.Hom.unop_inj <|
+    P.uniq s.unop m.unop fun j => Quiver.Hom.op_inj <| w (.op j)
 
 /-- If `t : Cone F.op` is a limit cone, then `t.unop : Cocone F` is a colimit cocone.
 -/
 def IsLimit.unop {t : Cone F.op} (P : IsLimit t) : IsColimit t.unop where
   desc s := (P.lift s.op).unop
   fac s j := congrArg Quiver.Hom.unop (P.fac s.op (.op j))
-  uniq s m w := by
-    dsimp
-    rw [← P.uniq s.op m.op]
-    · rfl
-    · dsimp
-      intro j
-      rw [← w]
-      rfl
+  uniq s m w := Quiver.Hom.op_inj <|
+    P.uniq s.op m.op fun j => Quiver.Hom.unop_inj <| w j.unop
 
 /-- If `t : Cocone F.op` is a colimit cocone, then `t.unop : Cone F` is a limit cone.
 -/
 def IsColimit.unop {t : Cocone F.op} (P : IsColimit t) : IsLimit t.unop where
   lift s := (P.desc s.op).unop
   fac s j := congrArg Quiver.Hom.unop (P.fac s.op (.op j))
-  uniq s m w := by
-    dsimp
-    rw [← P.uniq s.op m.op]
-    · rfl
-    · dsimp
-      intro j
-      rw [← w]
-      rfl
+  uniq s m w := Quiver.Hom.op_inj <|
+    P.uniq s.op m.op fun j => Quiver.Hom.unop_inj <| w j.unop
 
 /-- If `t.op : Cocone F.op` is a colimit cocone, then `t : Cone F` is a limit cone. -/
 def isLimitOfOp {t : Cone F} (P : IsColimit t.op) : IsLimit t :=

@@ -285,13 +285,8 @@ variable {H : C ⥤ Cat}
 set_option backward.isDefEq.respectTransparency false in
 theorem map_comp_eq (α : F ⟶ G) (β : G ⟶ H) :
     map (α ≫ β) = map α ⋙ map β := by
-  fapply Functor.ext
-  · intro X
-    rfl
-  · intro X Y f
-    simp only [map_map, map_obj_base, map_obj_fiber, NatTrans.comp_app, Cat.Hom.comp_toFunctor,
-      comp_obj, Cat.Hom₂.eqToHom_toNatTrans, eqToHom_app, Functor.comp_map, eqToHom_refl, map_comp,
-      eqToHom_map, eqToHom_trans_assoc, Category.comp_id, Category.id_comp]
+  exact Functor.hext (fun X => rfl) (fun X Y f => by
+    simp [map_map])
 
 /-- Making the equality of functors into an isomorphism. Note: we should avoid equality of functors
 if possible, and we should prefer `map_comp_iso` to `map_comp_eq` whenever we can. -/
@@ -343,21 +338,10 @@ def mapWhiskerRightAsSmallFunctor (α : F ⟶ G) :
     (fun f => by
       fapply Grothendieck.ext
       · simp [compAsSmallFunctorEquivalenceInverse]
-      · simp only [compAsSmallFunctorEquivalence_functor, compAsSmallFunctorEquivalence_inverse,
-        comp_obj, compAsSmallFunctorEquivalenceInverse_obj_base, map_obj_base,
-        compAsSmallFunctorEquivalenceFunctor_obj_base, Cat.asSmallFunctor_obj, Cat.of_α,
-        Iso.refl_hom, Functor.comp_map, comp_base, id_base,
-        compAsSmallFunctorEquivalenceInverse_map_base, map_map_base,
-        compAsSmallFunctorEquivalenceFunctor_map_base, Cat.asSmallFunctor_map, toCatHom_toFunctor,
-        map_obj_fiber, whiskerRight_app, AsSmall.down_obj, AsSmall.up_obj_down,
-        compAsSmallFunctorEquivalenceInverse_obj_fiber,
-        compAsSmallFunctorEquivalenceFunctor_obj_fiber, comp_fiber, map_map_fiber, AsSmall.down_map,
-        down_comp, eqToHom_down, AsSmall.up_map_down, map_comp, eqToHom_map, id_fiber,
-        Category.assoc, eqToHom_trans_assoc, compAsSmallFunctorEquivalenceInverse_map_fiber,
-        compAsSmallFunctorEquivalenceFunctor_map_fiber, eqToHom_comp_iff, comp_eqToHom_iff]
-        simp only [conj_eqToHom_iff_heq']
-        rw [G.map_id]
-        simp)
+      · simpa [compAsSmallFunctorEquivalenceInverse, down_comp, eqToHom_down, Category.assoc,
+          eqToHom_trans_assoc, eqToHom_comp_iff, comp_eqToHom_iff, conj_eqToHom_iff_heq'] using
+          congrArg AsSmall.up.map (Functor.congr_hom (congrArg Cat.Hom.toFunctor (G.map_id _))
+            ((α.app _).toFunctor.map f.fiber.down)))
 
 end
 

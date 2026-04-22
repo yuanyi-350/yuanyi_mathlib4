@@ -147,13 +147,7 @@ def mapArrowLeft (sq : f₁ ⟶ f₁') :
   left := sq₁₂.isPushout.desc
     ((F.map sq.right).app f₂.left ≫ sq₁₂'.inl)
     ((F.map sq.left).app f₂.right ≫ sq₁₂'.inr)
-    (by
-      #adaptation_note /-- Before https://github.com/leanprover/lean4/pull/13166
-      (replacing grind's canonicalizer with a type-directed normalizer), `grind` closed this
-      goal without the `simp only`. It is not yet clear whether this is due to defeq abuse in
-      Mathlib or a problem in the new canonicalizer; a minimization would help. The original
-      proof was: `by grind [sq.w, sq₁₂'.isPushout.w]` -/
-      simp only [Arrow.mk_left]; grind [sq.w, sq₁₂'.isPushout.w])
+    (by grind [sq.w, sq₁₂'.isPushout.w, Arrow.mk_left])
   right := (F.map sq.right).app f₂.right
   w := by
     apply PushoutObjObj.hom_ext
@@ -193,13 +187,7 @@ def mapArrowRight (sq : f₂ ⟶ f₂') :
   left := sq₁₂.isPushout.desc
     (((F.obj f₁.right).map sq.left) ≫ sq₁₂'.inl)
     (((F.obj f₁.left).map sq.right) ≫ sq₁₂'.inr)
-    (by
-      #adaptation_note /-- Before https://github.com/leanprover/lean4/pull/13166
-      (replacing grind's canonicalizer with a type-directed normalizer), `grind` closed this
-      goal without the `simp only`. It is not yet clear whether this is due to defeq abuse in
-      Mathlib or a problem in the new canonicalizer; a minimization would help. The original
-      proof was: `by grind [sq.w, sq₁₂'.isPushout.w]` -/
-      simp only [Arrow.mk_left]; grind [sq.w, sq₁₂'.isPushout.w])
+    (by grind [sq.w, sq₁₂'.isPushout.w, Arrow.mk_left])
   right := (F.obj f₁.right).map sq.right
   w := by
     apply PushoutObjObj.hom_ext

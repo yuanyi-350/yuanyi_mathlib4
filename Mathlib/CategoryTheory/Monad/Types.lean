@@ -50,27 +50,16 @@ def eq : KleisliCat m ≌ Kleisli (ofTypeMonad m) where
     { obj := fun X => .mk _ X
       map := fun f => .mk f
       map_id := fun _ => rfl
-      map_comp := fun f g => by
-        ext t
-        dsimp
-        simp only [joinM, bind_map_left, id_eq]
-        rfl }
+      map_comp := fun f g => Kleisli.hom_ext <| funext fun t => (bind_map_left g (f t) id).symm }
   inverse :=
     { obj := fun X => X.of
       map := fun f => f.of
       map_id := fun _ => rfl
       map_comp := fun f g => by
-        unfold_projs
-        -- Porting note: Need these instances for some lemmas below.
-        --Should they be added as actual instances elsewhere?
-        letI : _root_.Monad (ofTypeMonad m).obj :=
-          show _root_.Monad m from inferInstance
-        letI : LawfulMonad (ofTypeMonad m).obj :=
-          show LawfulMonad m from inferInstance
+        letI : _root_.Monad (ofTypeMonad m).obj := show _root_.Monad m from inferInstance
+        letI : LawfulMonad (ofTypeMonad m).obj := show LawfulMonad m from inferInstance
         funext t
-        simp only [ofTypeMonad_obj, Function.comp_apply, ofTypeMonad_map, ofTypeMonad_μ_app, joinM,
-          bind_map_left, id_eq]
-        rfl }
+        exact bind_map_left g.of (f.of t) id }
   unitIso := by
     refine NatIso.ofComponents (fun X => Iso.refl X) fun f => ?_
     change f >=> pure = pure >=> f

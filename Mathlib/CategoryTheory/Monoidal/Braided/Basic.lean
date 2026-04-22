@@ -653,34 +653,15 @@ theorem tensor_left_unitality (X₁ X₂ : C) :
     (λ_ (X₁ ⊗ X₂)).hom =
       ((λ_ (𝟙_ C)).inv ▷ (X₁ ⊗ X₂)) ≫
         tensorμ (𝟙_ C) (𝟙_ C) X₁ X₂ ≫ ((λ_ X₁).hom ⊗ₘ (λ_ X₂).hom) := by
-  dsimp only [tensorμ]
-  have :
-    ((λ_ (𝟙_ C)).inv ▷ (X₁ ⊗ X₂)) ≫
-        (α_ (𝟙_ C) (𝟙_ C) (X₁ ⊗ X₂)).hom ≫ (𝟙_ C ◁ (α_ (𝟙_ C) X₁ X₂).inv) =
-      𝟙_ C ◁ (λ_ X₁).inv ▷ X₂ := by
-    simp
-  slice_rhs 1 3 => rw [this]
-  clear this
-  slice_rhs 1 2 => rw [← whiskerLeft_comp, ← comp_whiskerRight,
-    leftUnitor_inv_braiding]
-  simp [tensorHom_def]
+  simp [tensorμ, tensorHom_def]
 
 @[reassoc]
 theorem tensor_right_unitality (X₁ X₂ : C) :
     (ρ_ (X₁ ⊗ X₂)).hom =
       ((X₁ ⊗ X₂) ◁ (λ_ (𝟙_ C)).inv) ≫
         tensorμ X₁ X₂ (𝟙_ C) (𝟙_ C) ≫ ((ρ_ X₁).hom ⊗ₘ (ρ_ X₂).hom) := by
-  dsimp only [tensorμ]
-  have :
-    ((X₁ ⊗ X₂) ◁ (λ_ (𝟙_ C)).inv) ≫
-        (α_ X₁ X₂ (𝟙_ C ⊗ 𝟙_ C)).hom ≫ (X₁ ◁ (α_ X₂ (𝟙_ C) (𝟙_ C)).inv) =
-      (α_ X₁ X₂ (𝟙_ C)).hom ≫ (X₁ ◁ (ρ_ X₂).inv ▷ 𝟙_ C) := by
-    monoidal
-  slice_rhs 1 3 => rw [this]
-  clear this
-  slice_rhs 2 3 => rw [← whiskerLeft_comp, ← comp_whiskerRight,
-    rightUnitor_inv_braiding]
-  simp [tensorHom_def]
+  simp [tensorμ, tensorHom_def]
+  monoidal
 
 @[reassoc]
 theorem tensor_associativity (X₁ X₂ Y₁ Y₂ Z₁ Z₂ : C) :
@@ -717,26 +698,14 @@ instance tensorMonoidal : (tensor C).Monoidal :=
 theorem leftUnitor_monoidal (X₁ X₂ : C) :
     (λ_ X₁).hom ⊗ₘ (λ_ X₂).hom =
       tensorμ (𝟙_ C) X₁ (𝟙_ C) X₂ ≫ ((λ_ (𝟙_ C)).hom ▷ (X₁ ⊗ X₂)) ≫ (λ_ (X₁ ⊗ X₂)).hom := by
-  dsimp only [tensorμ]
-  have :
-    (λ_ X₁).hom ⊗ₘ (λ_ X₂).hom =
-      (α_ (𝟙_ C) X₁ (𝟙_ C ⊗ X₂)).hom ≫
-        (𝟙_ C ◁ (α_ X₁ (𝟙_ C) X₂).inv) ≫ (λ_ ((X₁ ⊗ 𝟙_ C) ⊗ X₂)).hom ≫ ((ρ_ X₁).hom ▷ X₂) := by
-    monoidal
-  simp [this]
+  simp [tensorμ, tensorHom_def]
 
 @[reassoc]
 theorem rightUnitor_monoidal (X₁ X₂ : C) :
     (ρ_ X₁).hom ⊗ₘ (ρ_ X₂).hom =
       tensorμ X₁ (𝟙_ C) X₂ (𝟙_ C) ≫ ((X₁ ⊗ X₂) ◁ (λ_ (𝟙_ C)).hom) ≫ (ρ_ (X₁ ⊗ X₂)).hom := by
-  dsimp only [tensorμ]
-  have :
-    (ρ_ X₁).hom ⊗ₘ (ρ_ X₂).hom =
-      (α_ X₁ (𝟙_ C) (X₂ ⊗ 𝟙_ C)).hom ≫
-        (X₁ ◁ (α_ (𝟙_ C) X₂ (𝟙_ C)).inv) ≫ (X₁ ◁ (ρ_ (𝟙_ C ⊗ X₂)).hom) ≫ (X₁ ◁ (λ_ X₂).hom) := by
-    monoidal
-  rw [this]; clear this
   rw [← braiding_rightUnitor]
+  simp [tensorμ, tensorHom_def]
   monoidal
 
 @[reassoc]

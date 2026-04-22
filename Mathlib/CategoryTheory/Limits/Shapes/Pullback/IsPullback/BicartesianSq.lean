@@ -73,13 +73,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The square with `0 : 0 ⟶ 0` on the left and `𝟙 X` on the right is a pullback square. -/
 @[simp]
 theorem zero_left (X : C) : IsPullback (0 : 0 ⟶ X) (0 : (0 : C) ⟶ 0) (𝟙 X) (0 : 0 ⟶ X) :=
-  { w := by simp
-    isLimit' :=
-      ⟨{  lift := fun _ => 0
-          fac := fun s => by
-            simpa [eq_iff_true_of_subsingleton] using
-              @PullbackCone.equalizer_ext _ _ _ _ _ _ _ s _ 0 (𝟙 _)
-                (by simpa using (PullbackCone.condition s).symm) }⟩ }
+  by simpa using IsPullback.id_vert (0 : (0 : C) ⟶ X)
 
 /-- The square with `0 : 0 ⟶ 0` on the top and `𝟙 X` on the bottom is a pullback square. -/
 @[simp]
@@ -183,15 +177,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The square with `0 : 0 ⟶ 0` on the right and `𝟙 X` on the left is a pushout square. -/
 @[simp]
 theorem zero_right (X : C) : IsPushout (0 : X ⟶ 0) (𝟙 X) (0 : (0 : C) ⟶ 0) (0 : X ⟶ 0) :=
-  { w := by simp
-    isColimit' :=
-      ⟨{  desc := fun _ => 0
-          fac := fun s => by
-            have c :=
-              @PushoutCocone.coequalizer_ext _ _ _ _ _ _ _ s _ 0 (𝟙 _)
-                (by simp [eq_iff_true_of_subsingleton]) (by simpa using PushoutCocone.condition s)
-            dsimp at c
-            simpa using c }⟩ }
+  by simpa using IsPushout.id_vert (0 : X ⟶ 0)
 
 /-- The square with `0 : 0 ⟶ 0` on the bottom and `𝟙 X` on the top is a pushout square. -/
 @[simp]

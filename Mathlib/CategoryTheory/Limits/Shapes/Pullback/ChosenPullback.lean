@@ -229,22 +229,12 @@ lemma hom_ext {Y : C} {φ φ' : Y ⟶ h.pullback}
   apply h.isPullback₂.hom_ext <;> cat_disch
 
 lemma isPullback₁ : IsPullback h.p₁₂ h.p₁₃ h₁₂.p₁ h₁₃.p₁ :=
-  .mk' (by simp) (fun _ _ _ h₁ h₂ ↦ h.hom_ext (by simpa using h₁ =≫ h₁₂.p₁)
-      (by simpa using h₁ =≫ h₁₂.p₂) (by simpa using h₂ =≫ h₁₃.p₂))
-    (fun _ a b w ↦ by
-      obtain ⟨φ, hφ₁, hφ₂, hφ₃⟩ :=
-        h.exists_lift (a ≫ h₁₂.p₁) (a ≫ h₁₂.p₂) (b ≫ h₁₃.p₂) _ rfl
-          (by simp) (by simpa using w.symm =≫ f₁)
-      exact ⟨φ, by cat_disch, by cat_disch⟩)
+  IsPullback.of_bot (by simpa using h.isPullback₂.paste_vert h₂₃.isPullback)
+    (by simp) h₁₃.isPullback
 
 lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :=
-  .mk' (by simp) (fun _ _ _ h₁ h₂ ↦ h.hom_ext (by simpa using h₁ =≫ h₁₃.p₁)
-      (by simpa using h₂ =≫ h₂₃.p₁) (by simpa using h₁ =≫ h₁₃.p₂))
-    (fun _ a b w ↦ by
-      obtain ⟨φ, hφ₁, hφ₂, hφ₃⟩ :=
-        h.exists_lift (a ≫ h₁₃.p₁) (b ≫ h₂₃.p₁) (a ≫ h₁₃.p₂) _ rfl
-          (by simpa using w.symm =≫ f₃) (by simp)
-      exact ⟨φ, by cat_disch, by cat_disch⟩)
+  IsPullback.of_right (by simpa using h.isPullback₂.paste_horiz h₁₂.isPullback)
+    (by simp) h₁₃.isPullback
 
 end ChosenPullback₃
 

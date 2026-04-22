@@ -56,12 +56,8 @@ def rightAdjointLiftStructEquiv : sq.LiftStruct ≃ (sq.right_adjoint adj).LiftS
       fac_right := by rw [← Adjunction.homEquiv_naturality_right, l.fac_right] }
   invFun l :=
     { l := (adj.homEquiv _ _).symm l.l
-      fac_left := by
-        rw [← Adjunction.homEquiv_naturality_left_symm, l.fac_left]
-        apply (adj.homEquiv _ _).left_inv
-      fac_right := by
-        rw [← Adjunction.homEquiv_naturality_right_symm, l.fac_right]
-        apply (adj.homEquiv _ _).left_inv }
+      fac_left := by simpa [l.fac_left] using (adj.homEquiv_naturality_left_symm i l.l).symm
+      fac_right := by simpa [l.fac_right] using (adj.homEquiv_naturality_right_symm l.l p).symm }
   left_inv := by cat_disch
   right_inv := by cat_disch
 
@@ -102,12 +98,8 @@ def leftAdjointLiftStructEquiv :
       fac_right := by rw [← adj.homEquiv_naturality_right_symm, l.fac_right] }
   invFun l :=
     { l := (adj.homEquiv _ _) l.l
-      fac_left := by
-        rw [← adj.homEquiv_naturality_left, l.fac_left]
-        apply (adj.homEquiv _ _).right_inv
-      fac_right := by
-        rw [← adj.homEquiv_naturality_right, l.fac_right]
-        apply (adj.homEquiv _ _).right_inv }
+      fac_left := by simpa [l.fac_left] using (adj.homEquiv_naturality_left i l.l).symm
+      fac_right := by simpa [l.fac_right] using (adj.homEquiv_naturality_right l.l p).symm }
   left_inv := by cat_disch
   right_inv := by cat_disch
 

@@ -67,11 +67,7 @@ def Subfunctor.sheafify : Subfunctor F where
 
 theorem Subfunctor.le_sheafify : G ≤ G.sheafify J := by
   intro U s hs
-  change _ ∈ J _
-  convert J.top_mem U.unop
-  rw [eq_top_iff]
-  rintro V i -
-  exact G.map i.op hs
+  exact J.superset_covering (fun V i _ => G.map i.op hs) (J.top_mem U.unop)
 
 @[deprecated (since := "2025-12-11")] alias Subpresheaf.le_sheafify := Subfunctor.le_sheafify
 
@@ -201,15 +197,8 @@ alias Subpresheaf.to_sheafify_lift_unique := Subfunctor.to_sheafify_lift_unique
 theorem Subfunctor.sheafify_le (h : G ≤ G') (hF : Presieve.IsSheaf J F)
     (hG' : Presieve.IsSheaf J G'.toFunctor) : G.sheafify J ≤ G' := by
   intro U x hx
-  convert ((G.sheafifyLift (Subfunctor.homOfLe h) hG').app U ⟨x, hx⟩).2
-  apply (hF _ hx).isSeparatedFor.ext
-  intro V i hi
-  have :=
-    congr_arg (fun f : G.toFunctor ⟶ G'.toFunctor => (NatTrans.app f (op V) ⟨_, hi⟩).1)
-      (G.to_sheafifyLift (Subfunctor.homOfLe h) hG')
-  convert this.symm
-  rw [← Subfunctor.nat_trans_naturality]
-  rfl
+  exact (G'.isSheaf_iff hF).mp hG' U x <|
+    J.superset_covering (fun V i hi => h (op V) hi) hx
 
 @[deprecated (since := "2025-12-11")] alias Subpresheaf.sheafify_le := Subfunctor.sheafify_le
 

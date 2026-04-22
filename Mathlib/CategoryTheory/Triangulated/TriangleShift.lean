@@ -92,25 +92,12 @@ noncomputable def Triangle.shiftFunctorAdd' (a b n : ℤ) (h : a + b = n) :
       ((CategoryTheory.shiftFunctorAdd' C a b n h).app _)
       ((CategoryTheory.shiftFunctorAdd' C a b n h).app _)
       ((CategoryTheory.shiftFunctorAdd' C a b n h).app _)
+      (by subst h; simp [Int.negOnePow_add, mul_comm, smul_smul])
+      (by subst h; simp [Int.negOnePow_add, mul_comm, smul_smul])
       (by
         subst h
-        dsimp
-        rw [Linear.units_smul_comp, NatTrans.naturality, Linear.comp_units_smul, Functor.comp_map,
-          Functor.map_units_smul, Linear.comp_units_smul, smul_smul, Int.negOnePow_add, mul_comm])
-      (by
-        subst h
-        dsimp
-        rw [Linear.units_smul_comp, NatTrans.naturality, Linear.comp_units_smul, Functor.comp_map,
-          Functor.map_units_smul, Linear.comp_units_smul, smul_smul, Int.negOnePow_add, mul_comm])
-      (by
-        subst h
-        dsimp
-        rw [Linear.units_smul_comp, Linear.comp_units_smul, Functor.map_units_smul,
-          Linear.units_smul_comp, Linear.comp_units_smul, smul_smul, assoc,
-          Functor.map_comp, assoc]
-        erw [← NatTrans.naturality_assoc]
-        simp only [shiftFunctorAdd'_eq_shiftFunctorAdd, Int.negOnePow_add,
-          shiftFunctorComm_hom_app_comp_shift_shiftFunctorAdd_hom_app, add_comm a]))
+        simp [Int.negOnePow_add, mul_comm, smul_smul,
+          shiftFunctorComm_hom_app_comp_shift_shiftFunctorAdd_hom_app]))
     (by cat_disch)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -139,20 +126,11 @@ noncomputable def invRotateInvRotateInvRotateIso :
 rotation and the shift by `-1`. -/
 noncomputable def invRotateIsoRotateRotateShiftFunctorNegOne :
     invRotate C ≅ rotate C ⋙ rotate C ⋙ Triangle.shiftFunctor C (-1) :=
-  calc
-    invRotate C ≅ invRotate C ⋙ 𝟭 _ := (Functor.rightUnitor _).symm
-    _ ≅ invRotate C ⋙ Triangle.shiftFunctor C 0 :=
-          Functor.isoWhiskerLeft _ (Triangle.shiftFunctorZero C).symm
-    _ ≅ invRotate C ⋙ Triangle.shiftFunctor C 1 ⋙ Triangle.shiftFunctor C (-1) :=
-          Functor.isoWhiskerLeft _ (Triangle.shiftFunctorAdd' C 1 (-1) 0 (add_neg_cancel 1))
-    _ ≅ invRotate C ⋙ (rotate C ⋙ rotate C ⋙ rotate C) ⋙ Triangle.shiftFunctor C (-1) :=
-          Functor.isoWhiskerLeft _ (Functor.isoWhiskerRight (rotateRotateRotateIso C).symm _)
-    _ ≅ (invRotate C ⋙ rotate C) ⋙ rotate C ⋙ rotate C ⋙ Triangle.shiftFunctor C (-1) :=
-          Functor.isoWhiskerLeft _ (Functor.associator _ _ _ ≪≫
-            Functor.isoWhiskerLeft _ (Functor.associator _ _ _)) ≪≫ (Functor.associator _ _ _).symm
-    _ ≅ 𝟭 _ ⋙ rotate C ⋙ rotate C ⋙ Triangle.shiftFunctor C (-1) :=
-          Functor.isoWhiskerRight (triangleRotation C).counitIso _
-    _ ≅ _ := Functor.leftUnitor _
+  let i : 𝟭 (Triangle C) ≅ rotate C ⋙ rotate C ⋙ rotate C ⋙ Triangle.shiftFunctor C (-1) :=
+    (Triangle.shiftFunctorZero C).symm ≪≫
+      Triangle.shiftFunctorAdd' C 1 (-1) 0 (add_neg_cancel 1) ≪≫
+      Functor.isoWhiskerRight (rotateRotateRotateIso C).symm _
+  (Functor.rightUnitor _).symm ≪≫ Iso.inverseCompIso (G := triangleRotation C) i
 
 namespace Triangle
 

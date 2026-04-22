@@ -53,19 +53,11 @@ noncomputable irreducible_def hasLocalizationOfLocallySmall'
     (L : C ⥤ D) [L.IsLocalization W] :
     HasLocalization.{w} W := by
   have : LocallySmall.{w} (InducedCategory _ L.obj) :=
-    ⟨fun X Y ↦ small_of_injective InducedCategory.homEquiv.injective⟩
-  let L' : C ⥤ (InducedCategory _ L.obj) :=
-    { obj X := X
-      map f := InducedCategory.homMk (L.map f) }
+    locallySmall_of_faithful (inducedFunctor L.obj)
   have := Localization.essSurj L W
   have : (inducedFunctor L.obj).EssSurj := ⟨fun Y ↦ ⟨_, ⟨L.objObjPreimageIso Y⟩⟩⟩
   have : (inducedFunctor L.obj).IsEquivalence := { }
-  let e := (inducedFunctor L.obj).asEquivalence
-  let e' : (L' ⋙ e.functor) ⋙ e.inverse ≅ L' :=
-    associator _ _ _ ≪≫ isoWhiskerLeft L' e.unitIso.symm ≪≫ L'.rightUnitor
-  have : L'.IsLocalization W :=
-    Functor.IsLocalization.of_iso W (L₁ := L ⋙ e.inverse) e'
-  exact hasLocalizationOfLocallySmall.{w} W L'
+  exact hasLocalizationOfLocallySmall.{w} W (L ⋙ (inducedFunctor L.obj).asEquivalence.inverse)
 
 /-- If a class of morphisms `W : MorphismProperty C` satisfies `HasLocalization.{w} W`,
 then any localized category for `W` (i.e. any target of a localization functor

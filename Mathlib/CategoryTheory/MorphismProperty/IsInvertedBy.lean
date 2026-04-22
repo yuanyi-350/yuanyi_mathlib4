@@ -137,24 +137,13 @@ set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma IsInvertedBy.isoClosure_iff (W : MorphismProperty C) (F : C ⥤ D) :
     W.isoClosure.IsInvertedBy F ↔ W.IsInvertedBy F := by
-  constructor
-  · intro h X Y f hf
-    exact h _ (W.le_isoClosure _ hf)
-  · intro h X Y f ⟨X', Y', f', hf', ⟨e⟩⟩
-    simp only [Arrow.iso_w' e, F.map_comp]
-    have := h _ hf'
-    infer_instance
+  exact isoClosure_le_iff W ((isomorphisms D).inverseImage F)
 
 @[simp]
 lemma IsInvertedBy.iff_comp {C₁ C₂ C₃ : Type*} [Category* C₁] [Category* C₂] [Category* C₃]
     (W : MorphismProperty C₁) (F : C₁ ⥤ C₂) (G : C₂ ⥤ C₃) [G.ReflectsIsomorphisms] :
     W.IsInvertedBy (F ⋙ G) ↔ W.IsInvertedBy F := by
-  constructor
-  · intro h X Y f hf
-    have : IsIso (G.map (F.map f)) := h _ hf
-    exact isIso_of_reflects_iso (F.map f) G
-  · intro hF
-    exact IsInvertedBy.of_comp W F hF G
+  simp [IsInvertedBy, isIso_iff_of_reflects_iso]
 
 lemma IsInvertedBy.iff_le_inverseImage_isomorphisms (W : MorphismProperty C) (F : C ⥤ D) :
     W.IsInvertedBy F ↔ W ≤ (isomorphisms D).inverseImage F := Iff.rfl

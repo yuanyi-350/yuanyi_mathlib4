@@ -189,13 +189,8 @@ set_option backward.isDefEq.respectTransparency false in
 when `a + 1 = b`. -/
 noncomputable def triangleLEGEIsoTriangleLTGE (a b : ℤ) (h : a + 1 = b) :
     t.triangleLEGE a b h ≅ t.triangleLTGE b := by
-  refine Triangle.functorIsoMk _ _ (t.truncLEIsoTruncLT a b h) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_
-  · cat_disch
-  · cat_disch
-  · ext
-    dsimp [truncGEδLE]
-    simp only [Category.assoc, Category.id_comp, ← Functor.map_comp,
-      Iso.inv_hom_id_app, Functor.map_id, Category.comp_id]
+  exact Triangle.functorIsoMk' (t.truncLEIsoTruncLT a b h) (Iso.refl _) (Iso.refl _)
+    (by cat_disch) (by cat_disch) (by simp [truncGEδLE, ← Functor.whiskerRight_comp])
 
 lemma triangleLEGE_distinguished (a b : ℤ) (h : a + 1 = b) (X : C) :
     (t.triangleLEGE a b h).obj X ∈ distTriang C :=
@@ -220,12 +215,8 @@ set_option backward.isDefEq.respectTransparency false in
 when `a + 1 = b`. -/
 noncomputable def triangleLEGTIsoTriangleLEGE (a b : ℤ) (h : a + 1 = b) :
     t.triangleLEGT a ≅ t.triangleLEGE a b h :=
-  Triangle.functorIsoMk _ _ (Iso.refl _) (Iso.refl _) (t.truncGTIsoTruncGE a b h)
-    (by cat_disch) (by cat_disch) (by
-      ext
-      dsimp [truncGTδLE]
-      subst h
-      simp only [Functor.map_id, Category.comp_id])
+  Triangle.functorIsoMk' (Iso.refl _) (Iso.refl _) (t.truncGTIsoTruncGE a b h)
+    (by cat_disch) (by cat_disch) (by subst h; simp [truncGTδLE])
 
 lemma triangleLEGT_distinguished (n : ℤ) (X : C) :
     (t.triangleLEGT n).obj X ∈ distTriang C :=

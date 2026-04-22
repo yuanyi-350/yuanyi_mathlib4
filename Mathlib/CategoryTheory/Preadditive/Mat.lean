@@ -196,14 +196,10 @@ instance hasFiniteBiproducts : HasFiniteBiproducts (Mat_ C) where
               simp only [ite_self, dite_eq_ite, Limits.comp_zero, Limits.zero_comp,
                 eqToHom_trans]
               erw [Finset.sum_sigma]
-              dsimp +instances
-              simp only [if_true, Finset.sum_dite_irrel, Finset.mem_univ,
-                Finset.sum_const_zero, Finset.sum_dite_eq']
+              simp
               split_ifs with h h'
-              · substs h h'
-                simp only [CategoryTheory.eqToHom_refl, CategoryTheory.Mat_.id_apply_self]
-              · subst h
-                rw [eqToHom_refl, id_apply_of_ne _ _ _ h']
+              · substs h h'; simp
+              · subst h; simp [h']
               · rfl }
           (by
             dsimp
@@ -258,11 +254,7 @@ set_option backward.isDefEq.respectTransparency false in
 -/
 @[simps!]
 def mapMatId : (𝟭 C).mapMat_ ≅ 𝟭 (Mat_ C) :=
-  NatIso.ofComponents (fun M => eqToIso (by cases M; rfl)) fun {M N} f => by
-    classical
-    ext
-    cases M; cases N
-    simp [comp_dite, dite_comp]
+  NatIso.ofComponents (fun M => eqToIso (by cases M; rfl)) fun {M N} f => by aesop_cat
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Composite functors induce composite functors on matrix categories.
@@ -270,11 +262,7 @@ set_option backward.isDefEq.respectTransparency false in
 @[simps!]
 def mapMatComp {E : Type*} [Category.{v₁} E] [Preadditive E] (F : C ⥤ D) [Functor.Additive F]
     (G : D ⥤ E) [Functor.Additive G] : (F ⋙ G).mapMat_ ≅ F.mapMat_ ⋙ G.mapMat_ :=
-  NatIso.ofComponents (fun M => eqToIso (by cases M; rfl)) fun {M N} f => by
-    classical
-    ext
-    cases M; cases N
-    simp [comp_dite, dite_comp]
+  NatIso.ofComponents (fun M => eqToIso (by cases M; rfl)) fun {M N} f => by aesop_cat
 
 end Functor
 

@@ -120,48 +120,12 @@ theorem isSheaf_toGrothendieck_iff (P : Cᵒᵖ ⥤ Type*) :
       exact ih (f ≫ _)
     | transitive X R S hS h H1 H2 =>
       intro Y f
-      simp only [← Presieve.isSeparatedFor_and_exists_isAmalgamation_iff_isSheafFor] at *
-      choose H1 H1' using H1
-      choose H2 H2' using H2
-      refine ⟨?_, fun x hx => ?_⟩
-      · intro x t₁ t₂ h₁ h₂
-        refine (H1 f).ext (fun Z g hg => ?_)
-        refine (H2 hg (𝟙 _)).ext (fun ZZ gg hgg => ?_)
-        simp only [Sieve.pullback_id, Sieve.pullback_apply] at hgg
-        simp only [← types_comp_apply]
-        rw [← P.map_comp, ← op_comp, h₁, h₂]
-        simpa only [Sieve.pullback_apply, Category.assoc] using hgg
-      let y : ∀ ⦃Z : C⦄ (g : Z ⟶ Y),
-        ((S.pullback (g ≫ f)).pullback (𝟙 _)).arrows.FamilyOfElements P :=
-        fun Z g ZZ gg hgg => x (gg ≫ g) (by simpa using hgg)
-      have hy : ∀ ⦃Z : C⦄ (g : Z ⟶ Y), (y g).Compatible := by
-        intro Z g Y₁ Y₂ ZZ g₁ g₂ f₁ f₂ h₁ h₂ h
-        rw [hx]
-        rw [reassoc_of% h]
-      choose z hz using fun ⦃Z : C⦄ ⦃g : Z ⟶ Y⦄ (hg : R.pullback f g) =>
-        H2' hg (𝟙 _) (y g) (hy g)
-      let q : (R.pullback f).arrows.FamilyOfElements P := fun Z g hg => z hg
-      have hq : q.Compatible := by
-        intro Y₁ Y₂ Z g₁ g₂ f₁ f₂ h₁ h₂ h
-        apply (H2 h₁ g₁).ext
-        intro ZZ gg hgg
-        simp only [← types_comp_apply]
-        rw [← P.map_comp, ← P.map_comp, ← op_comp, ← op_comp, hz, hz]
-        · dsimp [y]; congr 1; simp only [Category.assoc, h]
-        · simpa [reassoc_of% h] using hgg
-        · simpa using hgg
-      obtain ⟨t, ht⟩ := H1' f q hq
-      refine ⟨t, fun Z g hg => ?_⟩
-      refine (H1 (g ≫ f)).ext (fun ZZ gg hgg => ?_)
-      rw [← types_comp_apply _ (P.map gg.op), ← P.map_comp, ← op_comp, ht]
-      on_goal 2 => simpa using hgg
-      refine (H2 hgg (𝟙 _)).ext (fun ZZZ ggg hggg => ?_)
-      rw [← types_comp_apply _ (P.map ggg.op), ← P.map_comp, ← op_comp, hz]
-      on_goal 2 => simpa using hggg
-      refine (H2 hgg ggg).ext (fun ZZZZ gggg _ => ?_)
-      rw [← types_comp_apply _ (P.map gggg.op), ← P.map_comp, ← op_comp]
-      apply hx
-      simp
+      apply Presieve.isSheafFor_trans P (R.pullback f) (S.pullback f)
+      · exact H1 f
+      · intro Z g hg
+        simpa [Sieve.pullback_comp] using (H1 (g ≫ f)).isSeparatedFor
+      · intro Z g hg
+        simpa [Sieve.pullback_comp] using H2 hg (𝟙 _)
 
 lemma mem_toGrothendieck_iff_of_isStableUnderComposition [IsStableUnderComposition J]
     [IsStableUnderBaseChange J] [J.HasPullbacks] [HasIsos J] {X : C} {S : Sieve X} :

@@ -223,22 +223,8 @@ theorem uniq {K : J ⥤ C} {c : Cone K} (hc : IsLimit c) (s : Cone (K ⋙ F))
     injection c₀.π.naturality (BiconeHom.left j) with _ e₁
     injection c₀.π.naturality (BiconeHom.right j) with _ e₂
     convert e₁.symm.trans e₂ <;> simp [c₁, c₂]
-  have : c.extend g₁.right = c.extend g₂.right := by
-    unfold Cone.extend
-    congr 1
-    ext x
-    apply this
   -- And thus they are equal as `c` is the limit.
-  have : g₁.right = g₂.right := calc
-    g₁.right = hc.lift (c.extend g₁.right) := by
-      apply hc.uniq (c.extend _)
-      simp
-    _ = hc.lift (c.extend g₂.right) := by
-      congr
-    _ = g₂.right := by
-      symm
-      apply hc.uniq (c.extend _)
-      simp
+  have : g₁.right = g₂.right := hc.hom_ext this
   -- Finally, since `fᵢ` factors through `F(gᵢ)`, the result follows.
   calc
     f₁ = 𝟙 _ ≫ f₁ := by simp
@@ -299,21 +285,10 @@ noncomputable def lanEvaluationIsoColim (F : C ⥤ D) (X : D)
     [∀ X : D, HasColimitsOfShape (CostructuredArrow F X) E] :
     F.lan ⋙ (evaluation D E).obj X ≅
       (Functor.whiskeringLeft _ _ E).obj (CostructuredArrow.proj F X) ⋙ colim :=
-  NatIso.ofComponents (fun G =>
-    IsColimit.coconePointUniqueUpToIso
-    (Functor.isPointwiseLeftKanExtensionLeftKanExtensionUnit F G X)
-    (colimit.isColimit _)) (fun {G₁ G₂} φ => by
-      apply (Functor.isPointwiseLeftKanExtensionLeftKanExtensionUnit F G₁ X).hom_ext
-      intro T
-      have h₁ := fun (G : C ⥤ E) => IsColimit.comp_coconePointUniqueUpToIso_hom
-        (Functor.isPointwiseLeftKanExtensionLeftKanExtensionUnit F G X) (colimit.isColimit _) T
-      have h₂ := congr_app (F.lanUnit.naturality φ) T.left
-      dsimp at h₁ h₂ ⊢
-      simp only [Category.assoc] at h₁ ⊢
-      simp only [Functor.lan, Functor.lanUnit] at h₂ ⊢
-      rw [reassoc_of% h₁, NatTrans.naturality_assoc, ← reassoc_of% h₂, h₁,
-        ι_colimMap, Functor.whiskerLeft_app]
-      rfl)
+  NatIso.ofComponents (fun G => F.leftKanExtensionObjIsoColimit G X) (fun {G₁ G₂} φ => by
+    apply (Functor.isPointwiseLeftKanExtensionLeftKanExtensionUnit F G₁ X).hom_ext
+    intro T
+    simp [Functor.lan, NatTrans.naturality_assoc])
 
 variable {FE : E → E → Type*} {CE : E → Type u₁} [∀ X Y, FunLike (FE X Y) (CE X) (CE Y)]
     [ConcreteCategory E FE] [HasLimits E] [HasColimits E]

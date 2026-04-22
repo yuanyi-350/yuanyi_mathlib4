@@ -8,6 +8,7 @@ module
 public import Mathlib.CategoryTheory.Abelian.Basic
 public import Mathlib.CategoryTheory.Preadditive.FunctorCategory
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.Finite
+public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.AbelianImages
 public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 
 /-!
@@ -40,39 +41,20 @@ variable {F G : C ⥤ D} (α : F ⟶ G) (X : C)
 /-- The abelian coimage in a functor category can be calculated componentwise. -/
 @[simps!]
 def coimageObjIso : (Abelian.coimage α).obj X ≅ Abelian.coimage (α.app X) :=
-  PreservesCokernel.iso ((evaluation C D).obj X) _ ≪≫
-    cokernel.mapIso _ _ (PreservesKernel.iso ((evaluation C D).obj X) _) (Iso.refl _)
-      (by
-        dsimp
-        simp only [Category.comp_id, PreservesKernel.iso_hom]
-        exact (kernelComparison_comp_ι _ ((evaluation C D).obj X)).symm)
+  Abelian.PreservesCoimage.iso ((evaluation C D).obj X) α
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The abelian image in a functor category can be calculated componentwise. -/
 @[simps!]
 def imageObjIso : (Abelian.image α).obj X ≅ Abelian.image (α.app X) :=
-  PreservesKernel.iso ((evaluation C D).obj X) _ ≪≫
-    kernel.mapIso _ _ (Iso.refl _) (PreservesCokernel.iso ((evaluation C D).obj X) _)
-      (by
-        apply (cancel_mono (PreservesCokernel.iso ((evaluation C D).obj X) α).inv).1
-        simp only [Category.assoc, Iso.hom_inv_id]
-        dsimp
-        simp only [PreservesCokernel.iso_inv, Category.id_comp, Category.comp_id]
-        exact (π_comp_cokernelComparison _ ((evaluation C D).obj X)).symm)
+  Abelian.PreservesImage.iso ((evaluation C D).obj X) α
 
 theorem coimageImageComparison_app :
     coimageImageComparison (α.app X) =
       (coimageObjIso α X).inv ≫ (coimageImageComparison α).app X ≫ (imageObjIso α X).hom := by
-  ext
-  dsimp
-  dsimp [imageObjIso, coimageObjIso, cokernel.map]
-  simp only [coimage_image_factorisation, PreservesKernel.iso_hom, Category.assoc,
-    kernel.lift_ι, Category.comp_id, PreservesCokernel.iso_inv,
-    cokernel.π_desc_assoc, Category.id_comp]
-  erw [kernelComparison_comp_ι _ ((evaluation C D).obj X)]
-  erw [π_comp_cokernelComparison_assoc _ ((evaluation C D).obj X)]
-  conv_lhs => rw [← coimage_image_factorisation α]
-  rfl
+  refine (Iso.eq_inv_comp (coimageObjIso α X)).2 ?_
+  simpa [coimageObjIso, imageObjIso] using
+    (Abelian.PreservesCoimage.hom_coimageImageComparison ((evaluation C D).obj X) α)
 
 theorem coimageImageComparison_app' :
     (coimageImageComparison α).app X =

@@ -95,14 +95,7 @@ lemma pullHom_pullHom' ⦃Y Y' : C⦄ (g : Y' ⟶ Y) (q : Y ⟶ S) (q' : Y' ⟶ 
       pullHom' hom q' gf₁ gf₂ := by
   let p := (sq i₁ i₂).isPullback.lift f₁ f₂ (by cat_disch)
   rw [pullHom'_eq_pullHom _ _ _ _ p, pullHom'_eq_pullHom _ _ _ _ (g ≫ p)]
-  dsimp [pullHom]
-  simp only [Functor.map_comp, Category.assoc]
-  rw [F.mapComp'₀₂₃_hom_comp_mapComp'_hom_whiskerRight_app_assoc
-    _ _ _ _ _ _ (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, IsPullback.lift_fst])
-    rfl (by cat_disch),
-    F.mapComp'_inv_whiskerRight_mapComp'₀₂₃_inv_app _ _ _ _ _ _
-      (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, IsPullback.lift_snd]) rfl (by cat_disch)]
-  simp
+  exact pullHom_pullHom (hom i₁ i₂) p f₁ f₂ g gf₁ gf₂
 
 end
 
@@ -238,11 +231,7 @@ lemma comm {D₁ D₂ : F.DescentData' sq sq₃} (φ : D₁ ⟶ D₂)
   rw [← pullHom_pullHom' D₂.hom p (sq i₁ i₂).p q (sq i₁ i₂).p₁ (sq i₁ i₂).p₂ f₁ f₂,
     ← pullHom_pullHom' D₁.hom p (sq i₁ i₂).p q (sq i₁ i₂).p₁ (sq i₁ i₂).p₂ f₁ f₂,
     pullHom'_p₁_p₂, pullHom'_p₁_p₂]
-  dsimp only [pullHom]
-  rw [NatTrans.naturality_assoc]
-  dsimp
-  rw [← Functor.map_comp_assoc, φ.comm, Functor.map_comp_assoc, mapComp'_inv_naturality]
-  simp only [Category.assoc]
+  simp [pullHom, ← Functor.map_comp_assoc, φ.comm]
 
 /-- Constructor for isomorphisms in the category `F.DescentData' sq sq₃`. -/
 @[simps]
@@ -279,12 +268,8 @@ def ofDescentData (D : F.DescentData f) : F.DescentData' sq sq₃ where
     rw [pullHom'_eq_pullHom _ _ _ _ p, D.pullHom_hom _ _ (f i), D.hom_self (f i) (𝟙 _)]
     all_goals cat_disch
   pullHom'_hom_comp i₁ i₂ i₃ := by
-    rw [pullHom'_eq_pullHom _ _ _ _ (sq₃ i₁ i₂ i₃).p₁₂,
-      pullHom'_eq_pullHom _ _ _ _ (sq₃ i₁ i₂ i₃).p₂₃,
-      pullHom'_eq_pullHom _ _ _ _ (sq₃ i₁ i₂ i₃).p₁₃,
-      D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p, D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p,
-      D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p, D.hom_comp]
-    all_goals cat_disch
+    simp [pullHom'₁₂_eq_pullHom_of_chosenPullback₃, pullHom'₂₃_eq_pullHom_of_chosenPullback₃,
+      pullHom'₁₃_eq_pullHom_of_chosenPullback₃, D.pullHom_hom]
 
 variable (sq sq₃) in
 @[simp]

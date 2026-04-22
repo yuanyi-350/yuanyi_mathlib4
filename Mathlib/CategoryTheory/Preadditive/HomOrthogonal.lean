@@ -78,15 +78,8 @@ noncomputable def matrixDecomposition (o : HomOrthogonal s) {α β : Type} [Fini
     ((⨁ fun a => s (f a)) ⟶ ⨁ fun b => s (g b)) ≃
       ∀ i : ι, Matrix (g ⁻¹' {i}) (f ⁻¹' {i}) (End (s i)) where
   toFun z i j k :=
-    eqToHom
-        (by
-          rcases k with ⟨k, ⟨⟩⟩
-          simp) ≫
-      biproduct.components z k j ≫
-        eqToHom
-          (by
-            rcases j with ⟨j, ⟨⟩⟩
-            simp)
+    eqToHom (by simpa using congrArg s k.2.symm) ≫ biproduct.components z k j ≫
+      eqToHom (by simpa using congrArg s j.2)
   invFun z :=
     biproduct.matrix fun j k =>
       if h : f j = g k then z (f j) ⟨k, by simp [h]⟩ ⟨j, by simp⟩ ≫ eqToHom (by simp [h]) else 0
@@ -148,7 +141,6 @@ theorem matrixDecomposition_comp (o : HomOrthogonal s) {α β γ : Type} [Finite
     (w : (⨁ fun b => s (g b)) ⟶ ⨁ fun c => s (h c)) (i : ι) :
     o.matrixDecomposition (z ≫ w) i = o.matrixDecomposition w i * o.matrixDecomposition z i := by
   ext ⟨c, ⟨⟩⟩ ⟨a, j_property⟩
-  simp only [Set.mem_preimage, Set.mem_singleton_iff] at j_property
   simp only [Matrix.mul_apply, Limits.biproduct.components,
     HomOrthogonal.matrixDecomposition_apply, Category.comp_id, Category.id_comp, Category.assoc,
     End.mul_def, eqToHom_refl, eqToHom_trans_assoc]
@@ -157,13 +149,8 @@ theorem matrixDecomposition_comp (o : HomOrthogonal s) {α β γ : Type} [Finite
   apply Finset.sum_congr_set
   · simp
   · intro b nm
-    simp only [Set.mem_preimage, Set.mem_singleton_iff] at nm
-    simp only [Category.assoc]
-    convert comp_zero
-    convert comp_zero
-    convert comp_zero
-    convert comp_zero
-    simp only [o.eq_zero nm]
+    simp [Set.mem_preimage, Set.mem_singleton_iff] at nm
+    simp [Category.assoc, o.eq_zero nm]
 
 section
 

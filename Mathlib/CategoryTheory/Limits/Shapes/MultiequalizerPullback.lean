@@ -39,12 +39,7 @@ noncomputable def multicofork : Multicofork I :=
       if hk : k = J.fst default then
         eqToHom (by simp [hk]) ≫ s.inl
       else
-        eqToHom (by
-          obtain rfl : k = J.snd default := by
-            have := h.symm.le (Set.mem_univ k)
-            push _ ∈ _ at this
-            tauto
-          rfl) ≫ s.inr)
+        eqToHom (by rw [(h.symm.le (Set.mem_univ k)).resolve_left hk]) ≫ s.inr)
     (by
       rw [Unique.forall_iff]
       simpa [h'.symm] using s.condition)
@@ -72,12 +67,8 @@ lemma isPushout (hc : IsColimit c) :
     (fun s ↦ hc.desc (isPushout.multicofork h h' s))
     (fun s ↦ by simpa using hc.fac (isPushout.multicofork h h' s) (.right (J.fst default)))
     (fun s ↦ by simpa using hc.fac (isPushout.multicofork h h' s) (.right (J.snd default)))
-    (fun s m h₁ h₂ ↦ by
-      apply Multicofork.IsColimit.hom_ext hc
-      intro k
-      have := h.symm.le (Set.mem_univ k)
-      push _ ∈ _ at this
-      obtain rfl | rfl := this
+    (fun s m h₁ h₂ ↦ Multicofork.IsColimit.hom_ext hc fun k ↦ by
+      rcases h.symm.le (Set.mem_univ k) with rfl | rfl
       · simpa [h₁] using (hc.fac (isPushout.multicofork h h' s) (.right (J.fst default))).symm
       · simpa [h₂] using (hc.fac (isPushout.multicofork h h' s) (.right (J.snd default))).symm)⟩
 

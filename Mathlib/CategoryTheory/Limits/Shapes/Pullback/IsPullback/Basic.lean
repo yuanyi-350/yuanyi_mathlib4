@@ -350,21 +350,11 @@ lemma of_prod_fst_with_id {A B : C} (f : A ⟶ B) (X : C) [HasBinaryProduct A X]
       · simpa using h₁
       · simp [← h₂])⟩
 
-set_option backward.isDefEq.respectTransparency false in
 lemma of_isLimit_binaryFan_of_isTerminal
     {X Y : C} {c : BinaryFan X Y} (hc : IsLimit c)
     {T : C} (hT : IsTerminal T) :
-    IsPullback c.fst c.snd (hT.from _) (hT.from _) where
-  isLimit' := ⟨PullbackCone.IsLimit.mk _
-    (fun s ↦ hc.lift (BinaryFan.mk s.fst s.snd))
-    (fun s ↦ hc.fac (BinaryFan.mk s.fst s.snd) ⟨.left⟩)
-    (fun s ↦ hc.fac (BinaryFan.mk s.fst s.snd) ⟨.right⟩)
-    (fun s m h₁ h₂ ↦ by
-      apply BinaryFan.IsLimit.hom_ext hc
-      · rw [h₁, hc.fac (BinaryFan.mk s.fst s.snd) ⟨.left⟩]
-        rfl
-      · rw [h₂, hc.fac (BinaryFan.mk s.fst s.snd) ⟨.right⟩]
-        rfl)⟩
+    IsPullback c.fst c.snd (hT.from _) (hT.from _) :=
+  of_is_product hc hT
 end
 
 lemma mk' {P X Y Z : C} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
@@ -375,15 +365,11 @@ lemma mk' {P X Y Z : C} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶
       (_ : a ≫ f = b ≫ g), ∃ (l : T ⟶ P), l ≫ fst = a ∧ l ≫ snd = b) :
     IsPullback fst snd f g where
   w := w
-  isLimit' := by
-    let l (s : PullbackCone f g) := exists_lift _ _ s.condition
-    exact ⟨PullbackCone.IsLimit.mk _
-      (fun s ↦ (l s).choose)
-      (fun s ↦ (l s).choose_spec.1)
-      (fun s ↦ (l s).choose_spec.2)
-      (fun s m h₁ h₂ ↦ hom_ext
-        (h₁.trans (l s).choose_spec.1.symm)
-        (h₂.trans (l s).choose_spec.2.symm))⟩
+  isLimit' := ⟨PullbackCone.isLimitAux' _ fun s ↦ by
+    let l := (exists_lift s.fst s.snd s.condition).choose
+    let hl := (exists_lift s.fst s.snd s.condition).choose_spec
+    exact ⟨l, hl.1, hl.2, fun {m} h₁ h₂ ↦ hom_ext
+      (h₁.trans hl.1.symm) (h₂.trans hl.2.symm)⟩⟩
 
 end IsPullback
 namespace IsPushout
@@ -693,22 +679,11 @@ lemma of_coprod_inl_with_id {A B : C} (f : A ⟶ B) (X : C) [HasBinaryCoproduct 
       · simpa using h₂
       · simp [← h₁])⟩
 
-set_option backward.isDefEq.respectTransparency false in
 lemma of_isColimit_binaryCofan_of_isInitial
     {X Y : C} {c : BinaryCofan X Y} (hc : IsColimit c)
     {I : C} (hI : IsInitial I) :
-    IsPushout (hI.to _) (hI.to _) c.inr c.inl where
-  w := hI.hom_ext _ _
-  isColimit' := ⟨PushoutCocone.IsColimit.mk _
-    (fun s ↦ hc.desc (BinaryCofan.mk s.inr s.inl))
-    (fun s ↦ hc.fac (BinaryCofan.mk s.inr s.inl) ⟨.right⟩)
-    (fun s ↦ hc.fac (BinaryCofan.mk s.inr s.inl) ⟨.left⟩)
-    (fun s m h₁ h₂ ↦ by
-      apply BinaryCofan.IsColimit.hom_ext hc
-      · rw [h₂, hc.fac (BinaryCofan.mk s.inr s.inl) ⟨.left⟩]
-        rfl
-      · rw [h₁, hc.fac (BinaryCofan.mk s.inr s.inl) ⟨.right⟩]
-        rfl)⟩
+    IsPushout (hI.to _) (hI.to _) c.inr c.inl :=
+  (of_is_coproduct hc hI).flip
 
 lemma mk' {Z X Y P : C} {f : Z ⟶ X} {g : Z ⟶ Y} {inl : X ⟶ P} {inr : Y ⟶ P}
     (w : f ≫ inl = g ≫ inr)
@@ -718,15 +693,11 @@ lemma mk' {Z X Y P : C} {f : Z ⟶ X} {g : Z ⟶ Y} {inl : X ⟶ P} {inr : Y ⟶
       (_ : f ≫ a = g ≫ b), ∃ (l : P ⟶ T), inl ≫ l = a ∧ inr ≫ l = b) :
     IsPushout f g inl inr where
   w := w
-  isColimit' := by
-    let l (s : PushoutCocone f g) := exists_desc _ _ s.condition
-    exact ⟨PushoutCocone.IsColimit.mk _
-      (fun s ↦ (l s).choose)
-      (fun s ↦ (l s).choose_spec.1)
-      (fun s ↦ (l s).choose_spec.2)
-      (fun s m h₁ h₂ ↦ hom_ext
-        (h₁.trans (l s).choose_spec.1.symm)
-        (h₂.trans (l s).choose_spec.2.symm))⟩
+  isColimit' := ⟨PushoutCocone.isColimitAux' _ fun s ↦ by
+    let l := (exists_desc s.inl s.inr s.condition).choose
+    let hl := (exists_desc s.inl s.inr s.condition).choose_spec
+    exact ⟨l, hl.1, hl.2, fun {m} h₁ h₂ ↦ hom_ext
+      (h₁.trans hl.1.symm) (h₂.trans hl.2.symm)⟩⟩
 
 end IsPushout
 
@@ -762,27 +733,15 @@ section Functor
 variable {D : Type u₂} [Category.{v₂} D]
 variable (F : C ⥤ D) {W X Y Z : C} {f : W ⟶ X} {g : W ⟶ Y} {h : X ⟶ Z} {i : Y ⟶ Z}
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Functor.map_isPullback [PreservesLimit (cospan h i) F] (s : IsPullback f g h i) :
-    IsPullback (F.map f) (F.map g) (F.map h) (F.map i) := by
-  refine
-    IsPullback.of_isLimit' (F.map_commSq s.toCommSq)
-      (IsLimit.equivOfNatIsoOfIso (cospanCompIso F h i) _ _ (WalkingCospan.ext ?_ ?_ ?_)
-        (isLimitOfPreserves F s.isLimit))
-  · rfl
-  · simp
-  · simp
+    IsPullback (F.map f) (F.map g) (F.map h) (F.map i) :=
+  IsPullback.of_isLimit' (F.map_commSq s.toCommSq)
+    (isLimitPullbackConeMapOfIsLimit F s.w s.isLimit)
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Functor.map_isPushout [PreservesColimit (span f g) F] (s : IsPushout f g h i) :
-    IsPushout (F.map f) (F.map g) (F.map h) (F.map i) := by
-  refine
-    IsPushout.of_isColimit' (F.map_commSq s.toCommSq)
-      (IsColimit.equivOfNatIsoOfIso (spanCompIso F f g) _ _ (WalkingSpan.ext ?_ ?_ ?_)
-        (isColimitOfPreserves F s.isColimit))
-  · rfl
-  · simp
-  · simp
+    IsPushout (F.map f) (F.map g) (F.map h) (F.map i) :=
+  IsPushout.of_isColimit' (F.map_commSq s.toCommSq)
+    (isColimitPushoutCoconeMapOfIsColimit F s.w s.isColimit)
 
 alias IsPullback.map := Functor.map_isPullback
 
@@ -790,12 +749,7 @@ alias IsPushout.map := Functor.map_isPushout
 
 theorem IsPullback.of_map [ReflectsLimit (cospan h i) F] (e : f ≫ h = g ≫ i)
     (H : IsPullback (F.map f) (F.map g) (F.map h) (F.map i)) : IsPullback f g h i := by
-  refine ⟨⟨e⟩, ⟨isLimitOfReflects F <| ?_⟩⟩
-  refine
-    (IsLimit.equivOfNatIsoOfIso (cospanCompIso F h i) _ _ (WalkingCospan.ext ?_ ?_ ?_)).symm
-      H.isLimit
-  exacts [Iso.refl _, (Category.comp_id _).trans (Category.id_comp _).symm,
-    (Category.comp_id _).trans (Category.id_comp _).symm]
+  exact ⟨⟨e⟩, ⟨isLimitOfIsLimitPullbackConeMap F e H.isLimit⟩⟩
 
 theorem IsPullback.of_map_of_faithful [ReflectsLimit (cospan h i) F] [F.Faithful]
     (H : IsPullback (F.map f) (F.map g) (F.map h) (F.map i)) : IsPullback f g h i :=
@@ -808,12 +762,7 @@ theorem IsPullback.map_iff {D : Type*} [Category* D] (F : C ⥤ D) [PreservesLim
 
 theorem IsPushout.of_map [ReflectsColimit (span f g) F] (e : f ≫ h = g ≫ i)
     (H : IsPushout (F.map f) (F.map g) (F.map h) (F.map i)) : IsPushout f g h i := by
-  refine ⟨⟨e⟩, ⟨isColimitOfReflects F <| ?_⟩⟩
-  refine
-    (IsColimit.equivOfNatIsoOfIso (spanCompIso F f g) _ _ (WalkingSpan.ext ?_ ?_ ?_)).symm
-      H.isColimit
-  exacts [Iso.refl _, (Category.comp_id _).trans (Category.id_comp _),
-    (Category.comp_id _).trans (Category.id_comp _)]
+  exact ⟨⟨e⟩, ⟨isColimitOfIsColimitPushoutCoconeMap F e H.isColimit⟩⟩
 
 theorem IsPushout.of_map_of_faithful [ReflectsColimit (span f g) F] [F.Faithful]
     (H : IsPushout (F.map f) (F.map g) (F.map h) (F.map i)) : IsPushout f g h i :=

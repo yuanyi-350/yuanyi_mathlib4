@@ -154,11 +154,7 @@ def Cone.equivCostructuredArrow (F : J ⥤ C) : Cone F ≌ CostructuredArrow (co
 
 /-- A cone is a limit cone iff it is terminal. -/
 def Cone.isLimitEquivIsTerminal {F : J ⥤ C} (c : Cone F) : IsLimit c ≃ IsTerminal c :=
-  IsLimit.isoUniqueConeMorphism.toEquiv.trans
-    { toFun := fun _ => IsTerminal.ofUnique _
-      invFun := fun h s => ⟨⟨IsTerminal.from h s⟩, fun a => IsTerminal.hom_ext h a _⟩
-      left_inv := by cat_disch
-      right_inv := by cat_disch }
+  IsLimit.isoUniqueConeMorphism.toEquiv.trans (isTerminalEquivUnique (Functor.empty.{0} _) c).symm
 
 theorem hasLimit_iff_hasTerminal_cone (F : J ⥤ C) : HasLimit F ↔ HasTerminal (Cone F) :=
   ⟨fun _ => (Cone.isLimitEquivIsTerminal _ (limit.isLimit F)).hasTerminal, fun h =>
@@ -314,11 +310,7 @@ def Cocone.equivStructuredArrow (F : J ⥤ C) : Cocone F ≌ StructuredArrow F (
 
 /-- A cocone is a colimit cocone iff it is initial. -/
 def Cocone.isColimitEquivIsInitial {F : J ⥤ C} (c : Cocone F) : IsColimit c ≃ IsInitial c :=
-  IsColimit.isoUniqueCoconeMorphism.toEquiv.trans
-    { toFun := fun _ => IsInitial.ofUnique _
-      invFun := fun h s => ⟨⟨IsInitial.to h s⟩, fun a => IsInitial.hom_ext h a _⟩
-      left_inv := by cat_disch
-      right_inv := by cat_disch }
+  IsColimit.isoUniqueCoconeMorphism.toEquiv.trans (isInitialEquivUnique (Functor.empty.{0} _) c).symm
 
 theorem hasColimit_iff_hasInitial_cocone (F : J ⥤ C) : HasColimit F ↔ HasInitial (Cocone F) :=
   ⟨fun _ => (Cocone.isColimitEquivIsInitial _ (colimit.isColimit F)).hasInitial, fun h =>

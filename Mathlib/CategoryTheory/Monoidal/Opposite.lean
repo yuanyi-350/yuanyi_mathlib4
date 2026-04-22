@@ -337,10 +337,6 @@ instance MonoidalOpposite.mopMopEquivalenceFunctorMonoidal :
   δ X Y := 𝟙 _
   μ X Y := 𝟙 _
   η := 𝟙 _
-  ε_η := Category.comp_id _
-  η_ε := Category.comp_id _
-  μ_δ X Y := Category.comp_id _
-  δ_μ X Y := Category.comp_id _
 
 set_option backward.isDefEq.respectTransparency false in
 @[simps!]
@@ -350,10 +346,6 @@ instance MonoidalOpposite.mopMopEquivalenceInverseMonoidal :
   δ X Y := 𝟙 _
   μ X Y := 𝟙 _
   η := 𝟙 _
-  ε_η := Category.comp_id _
-  η_ε := Category.comp_id _
-  μ_δ X Y := Category.comp_id _
-  δ_μ X Y := Category.comp_id _
 
 instance : (mopMopEquivalence C).IsMonoidal where
   leftAdjoint_ε := by
@@ -412,10 +404,6 @@ instance monoidalOpOp : (opOp C).Monoidal where
   η := 𝟙 _
   μ X Y := 𝟙 _
   δ X Y := 𝟙 _
-  ε_η := Category.comp_id _
-  η_ε := Category.comp_id _
-  μ_δ X Y := Category.comp_id _
-  δ_μ X Y := Category.comp_id _
 
 @[simps]
 instance monoidalUnopUnop : (unopUnop C).Monoidal where
@@ -423,10 +411,6 @@ instance monoidalUnopUnop : (unopUnop C).Monoidal where
   η := 𝟙 _
   μ X Y := 𝟙 _
   δ X Y := 𝟙 _
-  ε_η := Category.comp_id _
-  η_ε := Category.comp_id _
-  μ_δ X Y := Category.comp_id _
-  δ_μ X Y := Category.comp_id _
 
 instance : (opOpEquivalence C).functor.Monoidal := monoidalUnopUnop
 instance : (opOpEquivalence C).inverse.Monoidal := monoidalOpOp

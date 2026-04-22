@@ -59,11 +59,7 @@ def evaluationAdjunctionRight (c : C) : evaluationLeftAdjoint D c ⊣ (evaluatio
           left_inv := by
             intro f
             ext x
-            dsimp
-            ext g
-            simp only [colimit.ι_desc, Cofan.mk_ι_app, Category.assoc, ← f.naturality,
-              evaluationLeftAdjoint_obj_map, colimit.ι_desc_assoc,
-              Discrete.functor_obj, Cofan.mk_pt, Category.id_comp]
+            simpa using Sigma.hom_ext _ _ (fun g => by simp [← f.naturality])
           right_inv := fun f => by simp } }
 
 instance evaluationIsRightAdjoint (c : C) : ((evaluation _ D).obj c).IsRightAdjoint :=
@@ -105,11 +101,7 @@ def evaluationAdjunctionLeft (c : C) : (evaluation _ _).obj c ⊣ evaluationRigh
           right_inv := by
             intro f
             ext x
-            dsimp
-            ext g
-            simp only [NatTrans.naturality_assoc,
-              evaluationRightAdjoint_obj_obj, evaluationRightAdjoint_obj_map, limit.lift_π,
-              Fan.mk_pt, Fan.mk_π_app, Category.comp_id] } }
+            simpa using Pi.hom_ext _ _ (fun g => by simp) } }
 
 instance evaluationIsLeftAdjoint (c : C) : ((evaluation _ D).obj c).IsLeftAdjoint :=
   ⟨_, ⟨evaluationAdjunctionLeft _ _⟩⟩

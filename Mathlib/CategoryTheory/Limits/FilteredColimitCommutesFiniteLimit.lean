@@ -87,14 +87,7 @@ theorem colimitLimitToLimitColimit_injective :
     simp? [colimit_eq_iff] at h says
       simp only [comp_obj, colim_obj, ι_colimitLimitToLimitColimit_π_apply,
         colimit_eq_iff, curry_obj_obj_obj, curry_obj_obj_map] at h
-    let k j := (h j).choose
-    let f : ∀ j, kx ⟶ k j := fun j => (h j).choose_spec.choose
-    let g : ∀ j, ky ⟶ k j := fun j => (h j).choose_spec.choose_spec.choose
-    -- where the images of the components of the representatives become equal:
-    have w :
-      ∀ j, F.map (𝟙 j ×ₘ f j) (limit.π ((curry.obj (swap K J ⋙ F)).obj kx) j x) =
-          F.map (𝟙 j ×ₘ g j) (limit.π ((curry.obj (swap K J ⋙ F)).obj ky) j y) :=
-      fun j => (h j).choose_spec.choose_spec.choose_spec
+    choose k f g w using h
     -- We now use that `K` is filtered, picking some point to the right of all these
     -- morphisms `f j` and `g j`.
     let O : Finset K := Finset.univ.image k ∪ {kx, ky}
@@ -107,24 +100,12 @@ theorem colimitLimitToLimitColimit_injective :
         Finset.univ.image fun j : J => ⟨ky, k j, kyO, Finset.mem_union.mpr (Or.inl (by simp)), g j⟩
     obtain ⟨S, T, W⟩ := IsFiltered.sup_exists O H
     have fH : ∀ j, (⟨kx, k j, kxO, kjO j, f j⟩ : Σ' (X Y : K) (_ : X ∈ O) (_ : Y ∈ O), X ⟶ Y) ∈ H :=
-      fun j =>
-      Finset.mem_union.mpr
-        (Or.inl
-          (by
-            simp only [true_and, Finset.mem_univ,
-              Finset.mem_image]
-            refine ⟨j, ?_⟩
-            simp only))
+      fun j => by
+        exact Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ j))
     have gH :
       ∀ j, (⟨ky, k j, kyO, kjO j, g j⟩ : Σ' (X Y : K) (_ : X ∈ O) (_ : Y ∈ O), X ⟶ Y) ∈ H :=
-      fun j =>
-      Finset.mem_union.mpr
-        (Or.inr
-          (by
-            simp only [true_and, Finset.mem_univ,
-              Finset.mem_image]
-            refine ⟨j, ?_⟩
-            simp only))
+      fun j => by
+        exact Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ j))
     -- Our goal is now an equation between equivalence classes of representatives of a colimit,
     -- and so it suffices to show those representative become equal somewhere, in particular at `S`.
     apply colimit_sound' (T kxO) (T kyO)
@@ -162,20 +143,7 @@ theorem colimitLimitToLimitColimit_surjective :
     intro x
     -- This consists of some coherent family of elements in the various colimits,
     -- and so our first task is to pick representatives of these elements.
-    have z := fun j => jointly_surjective' (limit.π (curry.obj F ⋙ Limits.colim) j x)
-    -- `k : J ⟶ K` records where the representative of the
-    -- element in the `j`-th element of `x` lives
-    let k : J → K := fun j => (z j).choose
-    -- `y j : F.obj (j, k j)` is the representative
-    let y : ∀ j, F.obj (j, k j) := fun j => (z j).choose_spec.choose
-    -- and we record that these representatives, when mapped back into the relevant colimits,
-    -- are actually the components of `x`.
-    have e : ∀ j,
-        colimit.ι ((curry.obj F).obj j) (k j) (y j) = limit.π (curry.obj F ⋙ Limits.colim) j x :=
-      fun j => (z j).choose_spec.choose_spec
-    clear_value k y
-    -- A little tidying up of things we no longer need.
-    clear z
+    choose k y e using fun j => jointly_surjective' (limit.π (curry.obj F ⋙ Limits.colim) j x)
     -- As a first step, we use that `K` is filtered to pick some point `k' : K` above all the `k j`
     let k' : K := IsFiltered.sup (Finset.univ.image k) ∅
     -- and name the morphisms as `g j : k j ⟶ k'`.
@@ -200,22 +168,13 @@ theorem colimitLimitToLimitColimit_surjective :
     -- where these images of `y j` and `y j'` become equal.
     simp_rw [colimit_eq_iff] at w
     -- We take a moment to restate `w` more conveniently.
-    let kf : ∀ {j j'} (_ : j ⟶ j'), K := fun f => (w f).choose
-    let gf : ∀ {j j'} (f : j ⟶ j'), k' ⟶ kf f := fun f => (w f).choose_spec.choose
-    let hf : ∀ {j j'} (f : j ⟶ j'), k' ⟶ kf f := fun f =>
-      (w f).choose_spec.choose_spec.choose
+    choose kf gf hf q using fun {j j'} (f : j ⟶ j') => w f
     have wf :
       ∀ {j j'} (f : j ⟶ j'),
         F.map (𝟙 j' ×ₘ (g j' ≫ gf f)) (y j') = F.map (f ×ₘ (g j ≫ hf f)) (y j) :=
       fun {j j'} f => by
-      have q :
-        ((curry.obj F).obj j').map (gf f) (F.map (𝟙 j' ×ₘ g j') (y j')) =
-          ((curry.obj F).obj j').map (hf f) (F.map (f ×ₘ g j) (y j)) :=
-        (w f).choose_spec.choose_spec.choose_spec
-      dsimp only [curry_obj_obj_map, curry_obj_obj_map] at q
-      simp_rw [← FunctorToTypes.map_comp_apply, CategoryStruct.comp] at q
-      convert q <;> simp only [comp_id]
-    clear_value kf gf hf
+      simpa only [curry_obj_obj_map, ← FunctorToTypes.map_comp_apply, CategoryStruct.comp,
+        comp_id] using q f
     -- and clean up some things that are no longer needed.
     clear w
     -- We're now ready to use the fact that `K` is filtered a second time,
@@ -248,21 +207,11 @@ theorem colimitLimitToLimitColimit_surjective :
       · exact Finset.mem_biUnion.mpr ⟨j₃, Finset.mem_univ _,
           Finset.mem_biUnion.mpr ⟨j₄, Finset.mem_univ _,
             Finset.mem_biUnion.mpr ⟨f', Finset.mem_univ _, by
-              -- This works by `simp`, but has very high variation in heartbeats.
-              rw [Finset.mem_insert, PSigma.mk.injEq, heq_eq_eq, PSigma.mk.injEq, heq_eq_eq,
-                PSigma.mk.injEq, heq_eq_eq, PSigma.mk.injEq, heq_eq_eq, eq_self, true_and, eq_self,
-                true_and, eq_self, true_and, eq_self, true_and, Finset.mem_singleton, eq_self,
-                or_true]
-              trivial⟩⟩⟩
+              simp⟩⟩⟩
       · exact Finset.mem_biUnion.mpr ⟨j₁, Finset.mem_univ _,
           Finset.mem_biUnion.mpr ⟨j₂, Finset.mem_univ _,
             Finset.mem_biUnion.mpr ⟨f, Finset.mem_univ _, by
-              -- This works by `simp`, but has very high variation in heartbeats.
-              rw [Finset.mem_insert, PSigma.mk.injEq, heq_eq_eq, PSigma.mk.injEq, heq_eq_eq,
-                PSigma.mk.injEq, heq_eq_eq, PSigma.mk.injEq, heq_eq_eq, eq_self, true_and, eq_self,
-                true_and, eq_self, true_and, eq_self, true_and, Finset.mem_singleton, eq_self,
-                true_or]
-              trivial⟩⟩⟩
+              simp⟩⟩⟩
     clear_value i
     clear s' i' H kfO k'O O
     -- We're finally ready to construct the pre-image, and verify it really maps to `x`.

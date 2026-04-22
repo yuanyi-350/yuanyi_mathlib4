@@ -320,14 +320,8 @@ namespace Reflective
 set_option backward.isDefEq.respectTransparency false in
 instance [Reflective R] (X : (reflectorAdjunction R).toMonad.Algebra) :
     IsIso ((reflectorAdjunction R).unit.app X.A) :=
-  ⟨⟨X.a,
-      ⟨X.unit, by
-        dsimp only [Functor.id_obj]
-        rw [← (reflectorAdjunction R).unit_naturality]
-        dsimp only [Functor.comp_obj, Adjunction.toMonad_coe]
-        rw [unit_obj_eq_map_unit, ← Functor.map_comp, ← Functor.map_comp]
-        dsimp [X.unit]
-        simpa using congrArg (fun t ↦ R.map ((reflector R).map t)) X.unit ⟩⟩⟩
+  ((reflectorAdjunction R).toMonad.isSplitMono_iff_isIso_unit X.A).mp
+    (IsSplitMono.mk' { retraction := X.a, id := X.unit })
 
 set_option backward.isDefEq.respectTransparency false in
 instance comparison_essSurj [Reflective R] :
@@ -355,13 +349,8 @@ namespace Coreflective
 set_option backward.isDefEq.respectTransparency false in
 instance [Coreflective R] (X : (coreflectorAdjunction R).toComonad.Coalgebra) :
     IsIso ((coreflectorAdjunction R).counit.app X.A) :=
-  ⟨⟨X.a,
-      ⟨by
-        dsimp only [Functor.id_obj]
-        rw [← (coreflectorAdjunction R).counit_naturality]
-        dsimp only [Functor.comp_obj, Adjunction.toMonad_coe]
-        rw [counit_obj_eq_map_counit, ← Functor.map_comp, ← Functor.map_comp]
-        simpa using congrArg (fun t ↦ R.map ((coreflector R).map t)) X.counit, X.counit⟩⟩⟩
+  ((coreflectorAdjunction R).toComonad.isSplitEpi_iff_isIso_counit X.A).mp
+    (IsSplitEpi.mk' { section_ := X.a, id := X.counit })
 
 set_option backward.isDefEq.respectTransparency false in
 instance comparison_essSurj [Coreflective R] :

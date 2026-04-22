@@ -63,12 +63,7 @@ def Factors {X Y : C} (P : Subobject Y) (f : X ⟶ Y) : Prop :=
   Quotient.liftOn' P (fun P => P.Factors f)
     (by
       rintro P Q ⟨h⟩
-      apply propext
-      constructor
-      · rintro ⟨i, w⟩
-        exact ⟨i ≫ h.hom.hom.left, by rw [Category.assoc, Over.w h.hom.hom, w]⟩
-      · rintro ⟨i, w⟩
-        exact ⟨i ≫ h.inv.hom.left, by rw [Category.assoc, Over.w h.inv.hom, w]⟩)
+      exact propext (MonoOver.factors_congr f h))
 
 @[simp]
 theorem mk_factors_iff {X Y Z : C} (f : Y ⟶ X) [Mono f] (g : Z ⟶ X) :
@@ -133,13 +128,8 @@ theorem factorThru_comp_arrow {X Y : C} {P : Subobject Y} (f : X ⟶ P) (h) :
 @[simp]
 theorem factorThru_eq_zero [HasZeroMorphisms C] {X Y : C} {P : Subobject Y} {f : X ⟶ Y}
     {h : Factors P f} : P.factorThru f h = 0 ↔ f = 0 := by
-  fconstructor
-  · intro w
-    replace w := w =≫ P.arrow
-    simpa using w
-  · rintro rfl
-    ext
-    simp
+  rw [← cancel_mono P.arrow]
+  simp
 
 theorem factorThru_right {X Y Z : C} {P : Subobject Z} (f : X ⟶ Y) (g : Y ⟶ Z) (h : P.Factors g) :
     f ≫ P.factorThru g h = P.factorThru (f ≫ g) (factors_of_factors_right f h) := by

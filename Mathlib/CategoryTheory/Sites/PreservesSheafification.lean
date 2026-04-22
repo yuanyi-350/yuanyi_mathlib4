@@ -135,19 +135,14 @@ lemma GrothendieckTopology.preservesSheafification_iff_of_adjunctions
       IsIso (G₂.map (whiskerRight (adj₁.unit.app P) F)) := by
   simp only [← J.W_iff_isIso_map_of_adjunction adj₂]
   constructor
-  · intro _ P
-    apply W_of_preservesSheafification
-    rw [J.W_iff_isIso_map_of_adjunction adj₁]
-    infer_instance
+  · exact fun _ P => J.W_of_preservesSheafification F _ (J.W_adj_unit_app adj₁ P)
   · intro h
     constructor
     intro P₁ P₂ f hf
     rw [J.W_iff_isIso_map_of_adjunction adj₁] at hf
     dsimp [MorphismProperty.inverseImage]
     rw [← (W _).postcomp_iff _ _ (h P₂), ← whiskerRight_comp]
-    erw [adj₁.unit.naturality f]
-    dsimp only [Functor.comp_map]
-    rw [whiskerRight_comp, (W _).precomp_iff _ _ (h P₁)]
+    rw [← Adjunction.unit_naturality, whiskerRight_comp, (W _).precomp_iff _ _ (h P₁)]
     apply ObjectProperty.isLocal_of_isIso
 
 section HasSheafCompose
@@ -272,14 +267,9 @@ lemma sheafToPresheaf_map_sheafComposeNatTrans_eq_sheafifyCompIso_inv (P : Cᵒ�
     (sheafToPresheaf J E).map
       ((sheafComposeNatTrans J F (plusPlusAdjunction J D) (plusPlusAdjunction J E)).app P) =
       (sheafifyCompIso J F P).inv := by
-  suffices (sheafComposeNatTrans J F (plusPlusAdjunction J D) (plusPlusAdjunction J E)).app P =
-    ⟨(sheafifyCompIso J F P).inv⟩ by
-    rw [this]
-    rfl
-  apply ((plusPlusAdjunction J E).homEquiv _ _).injective
-  convert sheafComposeNatTrans_fac J F (plusPlusAdjunction J D) (plusPlusAdjunction J E) P
-  dsimp [plusPlusAdjunction]
-  simp
+  rw [← sheafComposeNatTrans_app_uniq J F (plusPlusAdjunction J D) (plusPlusAdjunction J E) P
+    ⟨(sheafifyCompIso J F P).inv⟩ (by simp [plusPlusAdjunction])]
+  rfl
 
 instance (P : Cᵒᵖ ⥤ D) :
     IsIso ((sheafComposeNatTrans J F (plusPlusAdjunction J D) (plusPlusAdjunction J E)).app P) := by

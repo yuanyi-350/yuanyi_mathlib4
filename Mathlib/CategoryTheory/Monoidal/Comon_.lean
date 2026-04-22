@@ -229,11 +229,7 @@ set_option backward.isDefEq.respectTransparency false in
 instance uniqueHomToTrivial (A : Comon C) : Unique (A ⟶ trivial C) where
   default.hom := ε[A.X]
   default.isComonHom_hom.hom_comul := by simp [unitors_inv_equal]
-  uniq f := by
-    ext
-    rw [← Category.comp_id f.hom]
-    dsimp only [trivial_X]
-    rw [← trivial_comon_counit, IsComonHom.hom_counit]
+  uniq f := Hom.ext (by simpa using IsComonHom.hom_counit f.hom)
 
 open CategoryTheory.Limits
 
@@ -246,16 +242,9 @@ open Opposite
 abbrev ComonToMonOpOpObjMon (A : Comon C) : MonObj (op A.X) where
   one := ε[A.X].op
   mul := Δ[A.X].op
-  one_mul := by
-    rw [← op_whiskerRight, ← op_comp, counit_comul]
-    rfl
-  mul_one := by
-    rw [← op_whiskerLeft, ← op_comp, comul_counit]
-    rfl
-  mul_assoc := by
-    rw [← op_inv_associator, ← op_whiskerRight, ← op_comp, ← op_whiskerLeft, ← op_comp,
-      comul_assoc_flip, op_comp, op_comp_assoc]
-    rfl
+  one_mul := Quiver.Hom.unop_inj (by simp)
+  mul_one := Quiver.Hom.unop_inj (by simp)
+  mul_assoc := Quiver.Hom.unop_inj (by simp)
 
 /--
 Turn a comonoid object into a monoid object in the opposite category.

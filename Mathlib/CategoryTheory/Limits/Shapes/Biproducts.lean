@@ -696,15 +696,9 @@ instance {ι} (f : ι → Type*) (g : (i : ι) → (f i) → C)
         ι := fun X => biproduct.ι (g X.1) X.2 ≫ biproduct.ι (fun i => ⨁ g i) X.1
         π := fun X => biproduct.π (fun i => ⨁ g i) X.1 ≫ biproduct.π (g X.1) X.2
         ι_π := fun ⟨j, x⟩ ⟨j', y⟩ => by
-          split_ifs with h
-          · obtain ⟨rfl, rfl⟩ := h
-            simp
-          · simp only [Sigma.mk.inj_iff, not_and] at h
-            by_cases w : j = j'
-            · cases w
-              simp only [heq_eq_eq, forall_true_left] at h
-              simp [biproduct.ι_π_ne _ h]
-            · simp [biproduct.ι_π_ne_assoc _ w] }
+          by_cases h : j = j' <;> subst_vars
+          · by_cases hxy : x = y <;> subst_vars <;> simp_all
+          · simp [h, biproduct.ι_π_ne_assoc _ h] }
       isBilimit :=
       { isLimit := mkFanLimit _
           (fun s => biproduct.lift fun b => biproduct.lift fun c => s.proj ⟨b, c⟩)
@@ -742,28 +736,20 @@ theorem biproduct.fromSubtype_π [DecidablePred p] (j : J) :
     biproduct.fromSubtype f p ≫ biproduct.π f j =
       if h : p j then biproduct.π (Subtype.restrict p f) ⟨j, h⟩ else 0 := by
   classical
-  ext i; dsimp
-  rw [biproduct.fromSubtype, biproduct.ι_desc_assoc, biproduct.ι_π]
-  by_cases h : p j
-  · rw [dif_pos h, biproduct.ι_π]
-    split_ifs with h₁ h₂ h₂
-    exacts [rfl, False.elim (h₂ (Subtype.ext h₁)), False.elim (h₁ (congr_arg Subtype.val h₂)), rfl]
-  · rw [dif_neg h, dif_neg (show (i : J) ≠ j from fun h₂ => h (h₂ ▸ i.2)), comp_zero]
+  ext i
+  by_cases h : p j <;> simp_all [biproduct.fromSubtype, Subtype.ext_iff, biproduct.ι_π]
+  exact fun h' => False.elim (h (h' ▸ i.2))
 
 theorem biproduct.fromSubtype_eq_lift [DecidablePred p] :
     biproduct.fromSubtype f p =
       biproduct.lift fun j => if h : p j then biproduct.π (Subtype.restrict p f) ⟨j, h⟩ else 0 :=
   biproduct.hom_ext _ _ (by simp)
 
-set_option backward.isDefEq.respectTransparency false in
 @[reassoc] -- Not `@[simp]` because `simp` can prove this
 theorem biproduct.fromSubtype_π_subtype (j : Subtype p) :
     biproduct.fromSubtype f p ≫ biproduct.π f j = biproduct.π (Subtype.restrict p f) j := by
   classical
-  ext
-  rw [biproduct.fromSubtype, biproduct.ι_desc_assoc, biproduct.ι_π, biproduct.ι_π]
-  split_ifs with h₁ h₂ h₂
-  exacts [rfl, False.elim (h₂ (Subtype.ext h₁)), False.elim (h₁ (congr_arg Subtype.val h₂)), rfl]
+  rw [biproduct.fromSubtype_π, dif_pos j.2]
 
 @[reassoc (attr := simp)]
 theorem biproduct.toSubtype_π (j : Subtype p) :
@@ -777,27 +763,19 @@ theorem biproduct.ι_toSubtype [DecidablePred p] (j : J) :
       if h : p j then biproduct.ι (Subtype.restrict p f) ⟨j, h⟩ else 0 := by
   classical
   ext i
-  rw [biproduct.toSubtype, Category.assoc, biproduct.lift_π, biproduct.ι_π]
-  by_cases h : p j
-  · rw [dif_pos h, biproduct.ι_π]
-    split_ifs with h₁ h₂ h₂
-    exacts [rfl, False.elim (h₂ (Subtype.ext h₁)), False.elim (h₁ (congr_arg Subtype.val h₂)), rfl]
-  · rw [dif_neg h, dif_neg (show j ≠ i from fun h₂ => h (h₂.symm ▸ i.2)), zero_comp]
+  by_cases h : p j <;> simp_all [biproduct.toSubtype, Subtype.ext_iff, biproduct.ι_π]
+  exact fun h' => False.elim (h (h'.symm ▸ i.2))
 
 theorem biproduct.toSubtype_eq_desc [DecidablePred p] :
     biproduct.toSubtype f p =
       biproduct.desc fun j => if h : p j then biproduct.ι (Subtype.restrict p f) ⟨j, h⟩ else 0 :=
   biproduct.hom_ext' _ _ (by simp)
 
-set_option backward.isDefEq.respectTransparency false in
 @[reassoc]
 theorem biproduct.ι_toSubtype_subtype (j : Subtype p) :
     biproduct.ι f j ≫ biproduct.toSubtype f p = biproduct.ι (Subtype.restrict p f) j := by
   classical
-  ext
-  rw [biproduct.toSubtype, Category.assoc, biproduct.lift_π, biproduct.ι_π, biproduct.ι_π]
-  split_ifs with h₁ h₂ h₂
-  exacts [rfl, False.elim (h₂ (Subtype.ext h₁)), False.elim (h₁ (congr_arg Subtype.val h₂)), rfl]
+  rw [biproduct.ι_toSubtype, dif_pos j.2]
 
 @[reassoc (attr := simp)]
 theorem biproduct.ι_fromSubtype (j : Subtype p) :

@@ -59,20 +59,9 @@ lemma subobjectMk_range_arrow (X : Subobject F) :
 /-- The order isomorphism `Subfunctor F ≃o MonoOver F`. -/
 @[simps]
 noncomputable def orderIsoSubobject : Subfunctor F ≃o Subobject F where
+  __ := ((equivalenceMonoOver F).symm.thinSkeletonOrderIso).symm
   toFun A := Subobject.mk A.ι
   invFun X := Subfunctor.range X.arrow
-  left_inv A := by simp
-  right_inv X := by simp
-  map_rel_iff' {A B} := by
-    constructor
-    · intro h
-      have : range (Subobject.mk A.ι).arrow ≤ range (Subobject.mk B.ι).arrow :=
-        leOfHom (((equivalenceMonoOver F).trans
-          (ThinSkeleton.equivalence _).symm).inverse.map (homOfLE h))
-      simpa using this
-    · intro h
-      exact leOfHom (((equivalenceMonoOver F).trans
-        (ThinSkeleton.equivalence _).symm).functor.map (homOfLE h))
 
 @[deprecated (since := "2025-12-11")] alias Subpresheaf.equivalenceMonoOver := equivalenceMonoOver
 @[deprecated (since := "2025-12-11")] alias Subpresheaf.range_subobjectMk_ι := range_subobjectMk_ι

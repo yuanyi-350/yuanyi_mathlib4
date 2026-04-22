@@ -53,10 +53,6 @@ def leftActionOfMonoidalOppositeRightAction [MonoidalRightAction Cᴹᵒᵖ D] :
   actionHom_def _ _ := MonoidalRightAction.actionHom_def' _ _
   actionAssocIso_hom_naturality _ _ _ :=
     MonoidalRightAction.actionAssocIso_hom_naturality _ _ _
-  actionUnitIso_hom_naturality _ :=
-    MonoidalRightAction.actionUnitIso_hom_naturality _
-  rightUnitor_actionHom c d :=
-    MonoidalRightAction.actionHom_leftUnitor _ _
   associator_actionHom c₁ c₂ c₃ d := by
     simpa only [mop_tensorObj, mop_hom_associator,
       MonoidalRightAction.actionHomRight_inv_hom_assoc] using
@@ -78,10 +74,6 @@ def monoidalOppositeLeftAction [MonoidalRightAction C D] :
   actionHom_def _ _ := MonoidalRightAction.actionHom_def' _ _
   actionAssocIso_hom_naturality _ _ _ :=
     MonoidalRightAction.actionAssocIso_hom_naturality _ _ _
-  actionUnitIso_hom_naturality _ :=
-    MonoidalRightAction.actionUnitIso_hom_naturality _
-  rightUnitor_actionHom c d :=
-    MonoidalRightAction.actionHom_leftUnitor _ _
   associator_actionHom c₁ c₂ c₃ d := by
     simpa only [mop_tensorObj, mop_hom_associator,
       MonoidalRightAction.actionHomRight_inv_hom_assoc] using
@@ -133,18 +125,8 @@ def oppositeLeftAction [MonoidalLeftAction C D] :
         simpa [MonoidalLeftAction.action_exchange] using
           MonoidalLeftAction.actionHom_def f g
   actionAssocIso_hom_naturality
-    | op f, op g, op h => by
-        apply Quiver.Hom.unop_inj
-        haveI := (αₗ (unop _) (unop _) (unop _)).inv ≫=
-          MonoidalLeftAction.actionAssocIso_hom_naturality f g h
-        simp only [Iso.inv_hom_id_assoc] at this
-        simp [← this]
-  actionUnitIso_hom_naturality _ := by
-    apply Quiver.Hom.unop_inj
-    simp
-  whiskerRight_actionHomLeft _ _ _ := by
-    apply Quiver.Hom.unop_inj
-    simp
+    | op f, op g, op h =>
+        Quiver.Hom.unop_inj <| by simpa using (actionAssocIso_inv_naturality f g h).symm
   associator_actionHom _ _ _ _ := by
     apply Quiver.Hom.unop_inj
     apply IsIso.inv_eq_inv.mp
@@ -173,18 +155,8 @@ def leftActionOfOppositeLeftAction [MonoidalLeftAction Cᵒᵖ Dᵒᵖ] :
     apply Quiver.Hom.op_inj
     simpa [MonoidalLeftAction.action_exchange] using
       MonoidalLeftAction.actionHom_def f.op g.op
-  actionAssocIso_hom_naturality f g h := by
-    apply Quiver.Hom.op_inj
-    haveI := (αₗ (op _) (op _) (op _)).inv ≫=
-      MonoidalLeftAction.actionAssocIso_hom_naturality f.op g.op h.op
-    simp only [Iso.inv_hom_id_assoc] at this
-    simp [← this]
-  actionUnitIso_hom_naturality _ := by
-    apply Quiver.Hom.op_inj
-    simp
-  whiskerRight_actionHomLeft _ _ _ := by
-    apply Quiver.Hom.op_inj
-    simp
+  actionAssocIso_hom_naturality f g h :=
+    Quiver.Hom.op_inj <| by simpa using (actionAssocIso_inv_naturality f.op g.op h.op).symm
   associator_actionHom _ _ _ _ := by
     apply Quiver.Hom.op_inj
     apply IsIso.inv_eq_inv.mp
@@ -345,18 +317,8 @@ def oppositeRightAction [MonoidalRightAction C D] :
         simpa [MonoidalRightAction.action_exchange] using
           MonoidalRightAction.actionHom_def f g
   actionAssocIso_hom_naturality
-    | op f, op g, op h => by
-        apply Quiver.Hom.unop_inj
-        haveI := (αᵣ (unop _) (unop _) (unop _)).inv ≫=
-          MonoidalRightAction.actionAssocIso_hom_naturality f g h
-        simp only [Iso.inv_hom_id_assoc] at this
-        simp [← this]
-  actionUnitIso_hom_naturality _ := by
-    apply Quiver.Hom.unop_inj
-    simp
-  whiskerRight_actionHomLeft _ _ _ _ _ := by
-    apply Quiver.Hom.unop_inj
-    simp
+    | op f, op g, op h =>
+        Quiver.Hom.unop_inj <| by simpa using (actionAssocIso_inv_naturality f g h).symm
   actionHom_associator _ _ _ _ := by
     apply Quiver.Hom.unop_inj
     apply IsIso.inv_eq_inv.mp
@@ -385,18 +347,8 @@ def rightActionOfOppositeRightAction [MonoidalRightAction Cᵒᵖ Dᵒᵖ] :
     apply Quiver.Hom.op_inj
     simpa [MonoidalRightAction.action_exchange] using
       MonoidalRightAction.actionHom_def f.op g.op
-  actionAssocIso_hom_naturality f g h := by
-    apply Quiver.Hom.op_inj
-    haveI := (αᵣ (op _) (op _) (op _)).inv ≫=
-      MonoidalRightAction.actionAssocIso_hom_naturality f.op g.op h.op
-    simp only [Iso.inv_hom_id_assoc] at this
-    simp [← this]
-  actionUnitIso_hom_naturality _ := by
-    apply Quiver.Hom.op_inj
-    simp
-  whiskerRight_actionHomLeft _ _ _ _ _ := by
-    apply Quiver.Hom.op_inj
-    simp
+  actionAssocIso_hom_naturality f g h :=
+    Quiver.Hom.op_inj <| by simpa using (actionAssocIso_inv_naturality f.op g.op h.op).symm
   actionHom_associator _ _ _ _ := by
     apply Quiver.Hom.op_inj
     apply IsIso.inv_eq_inv.mp
